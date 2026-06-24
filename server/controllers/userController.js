@@ -64,13 +64,13 @@ export const loginUser = async (req, res) => {
     // Check if user exists
     let user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({ message: "Email is not registered. Please sign up first." });
     }
 
     // Compare entered password with hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({ message: "Incorrect password." });
     }
 
     // Create JWT payload

@@ -968,8 +968,8 @@ export default function Dashboard() {
   const tokenUsername = getUsernameFromToken(token);
 
   const expectedPersonalId = tokenUserId ? `PERSONAL_${tokenUserId}` : null;
-  const storedRoomId = sessionStorage.getItem("shelfRoomId");
-  const storedRoomName = sessionStorage.getItem("shelfRoomName");
+  const storedRoomId = localStorage.getItem("shelfRoomId");
+  const storedRoomName = localStorage.getItem("shelfRoomName");
 
   const shouldUsePersonalShelf =
     !!expectedPersonalId &&
@@ -1025,8 +1025,8 @@ export default function Dashboard() {
       (storedRoomId !== expectedPersonalId ||
         storedRoomName !== "My Personal Shelf")
     ) {
-      sessionStorage.setItem("shelfRoomId", expectedPersonalId);
-      sessionStorage.setItem("shelfRoomName", "My Personal Shelf");
+      localStorage.setItem("shelfRoomId", expectedPersonalId);
+      localStorage.setItem("shelfRoomName", "My Personal Shelf");
     }
   }, [
     expectedPersonalId,

@@ -199,8 +199,8 @@ export default function RoomGate() {
         { roomId: joinId, password: joinPass },
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      sessionStorage.setItem("shelfRoomId", data.roomId);
-      sessionStorage.setItem("shelfRoomName", data.name);
+      localStorage.setItem("shelfRoomId", data.roomId);
+      localStorage.setItem("shelfRoomName", data.name);
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to join room");
@@ -242,8 +242,8 @@ export default function RoomGate() {
   };
 
   const enterCreatedRoom = () => {
-    sessionStorage.setItem("shelfRoomId", createdRoom.roomId);
-    sessionStorage.setItem("shelfRoomName", createdRoom.name);
+    localStorage.setItem("shelfRoomId", createdRoom.roomId);
+    localStorage.setItem("shelfRoomName", createdRoom.name);
     navigate("/");
   };
 
@@ -986,9 +986,9 @@ export default function RoomGate() {
                     if (token) {
                       const payload = JSON.parse(atob(token.split(".")[1]));
                       const personalRoomId = "PERSONAL_" + payload.user.id;
-                      sessionStorage.setItem("shelfRoomId", personalRoomId);
+                      localStorage.setItem("shelfRoomId", personalRoomId);
                     }
-                    sessionStorage.setItem(
+                    localStorage.setItem(
                       "shelfRoomName",
                       "My Personal Shelf",
                     );

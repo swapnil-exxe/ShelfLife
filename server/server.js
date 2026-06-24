@@ -5,14 +5,24 @@ import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
+import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
 import userRoutes from "./routes/userRoutes.js";
 import linkRoutes from "./routes/linkRoutes.js";
 import roomRoutes from "./routes/roomRoutes.js"; // ← NEW
 import projectRoutes from "./routes/projectRoutes.js";
 import { runContextFeedSweep } from "./services/contextFeedService.js";
+import {
+  generalLimiter,
+  loginLimiter,
+  sanitizeAndValidateInput,
+} from "./middlewares/securityMiddleware.js";
 
 const app = express();
 const server = http.createServer(app);
+
+// Use helmet for secure HTTP headers
+app.use(helmet());
 
 const io = new Server(server, {
   cors: { origin: "*" },
@@ -23,9 +33,19 @@ app.set("socketio", io);
 app.locals.io = io;
 
 app.use(express.json());
-app.use(
-  cors(),
-);
+app.use(cors());
+
+// Prevent NoSQL Injection
+app.use(mongoSanitize());
+
+// Sanitize HTML and validate types/sizes of all input fields
+app.use(sanitizeAndValidateInput);
+
+// Apply rate limiting
+app.use("/api/users/login", loginLimiter);
+app.use("/api/users/register", loginLimiter);
+app.use("/api", generalLimiter);
+
 app.use("/api/users", userRoutes);
 app.use("/api/links", linkRoutes);
 app.use("/api/rooms", roomRoutes); // ← NEW
@@ -128,8 +148,10 @@ io.on("connection", (socket) => {
 
   // ── 2. JOIN ROOM: client sends roomId after auth ──────────────────────────
   // Frontend must emit: socket.emit("JOIN_ROOM", { roomId: "A3F9B2" })
-  socket.on("JOIN_ROOM", ({ roomId }) => {
-    if (!roomId) return;
+  socket.on("JOIN_ROOM", (payload) => {
+    if (!payload || typeof payload !== "object") return;
+    const { roomId } = payload;
+    if (!roomId || typeof roomId !== "string") return;
 
     const upperRoomId = roomId.toUpperCase().trim();
 
@@ -176,6 +198,7 @@ io.on("connection", (socket) => {
 
   // ── 3. CURSOR MOVE — scoped to room ──────────────────────────────────────
   socket.on("CURSOR_MOVE", (data) => {
+    if (!data || typeof data !== "object") return;
     const user = connectedUsers.get(socket.id);
     if (!user?.roomId) return;
 
@@ -187,13 +210,14 @@ io.on("connection", (socket) => {
       type: "CURSOR_MOVE",
       socketId: socket.id,
       username: user.username,
-      x: data.x,
-      y: data.y,
+      x: typeof data.x === "number" ? data.x : 0,
+      y: typeof data.y === "number" ? data.y : 0,
     });
   });
 
   // ── 4. EMOJI REACTION — scoped to room ───────────────────────────────────
   socket.on("EMOJI_REACTION", (data) => {
+    if (!data || typeof data !== "object") return;
     const user = connectedUsers.get(socket.id);
     if (!user?.roomId) return;
 
@@ -202,8 +226,8 @@ io.on("connection", (socket) => {
     const payload = {
       socketId: socket.id,
       username: user.username,
-      cardId: data.cardId,
-      emoji: data.emoji,
+      cardId: typeof data.cardId === "string" ? data.cardId : "",
+      emoji: typeof data.emoji === "string" ? data.emoji : "",
     };
 
     // Send to everyone else in the room

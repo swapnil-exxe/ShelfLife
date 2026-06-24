@@ -230,15 +230,19 @@ const Register = () => {
     email: "",
     password: "",
   });
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const { username, email, password } = formData;
 
-  const onChange = (e) =>
+  const onChange = (e) => {
+    setError("");
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     try {
       const res = await axios.post(
         "/api/users/register",
@@ -247,15 +251,16 @@ const Register = () => {
       console.log("User registered successfully:", res.data);
       // Store the token and redirect
       localStorage.setItem("token", res.data.token);
-      sessionStorage.removeItem("shelfRoomId");
-      sessionStorage.removeItem("shelfRoomName");
+      localStorage.removeItem("shelfRoomId");
+      localStorage.removeItem("shelfRoomName");
       navigate("/"); // Redirect to home page after registration
     } catch (err) {
       console.error(
         "Registration error:",
         err.response ? err.response.data : err.message,
       );
-      // Here you would typically show an error message to the user
+      const errMsg = err.response?.data?.message || err.response?.data || "Something went wrong. Please check your inputs.";
+      setError(errMsg);
     }
   };
 
@@ -395,6 +400,29 @@ const Register = () => {
               Create your ShelfLife account
             </p>
           </div>
+
+          {error && (
+            <div
+              className="error-banner"
+              style={{
+                background: "rgba(239, 68, 68, 0.15)",
+                border: "1px solid rgba(239, 68, 68, 0.4)",
+                borderRadius: "12px",
+                color: "#ff6b6b",
+                padding: "12px 16px",
+                marginBottom: "20px",
+                fontSize: "13px",
+                fontWeight: 500,
+                textAlign: "left",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <span>⚠️</span>
+              <span>{error}</span>
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={onSubmit}>

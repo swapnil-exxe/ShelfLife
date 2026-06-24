@@ -7,8 +7,8 @@ export default function Navbar({ roomOnlineCount = null }) {
   const [isExtensionModalOpen, setIsExtensionModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const roomId = sessionStorage.getItem("shelfRoomId");
-  const roomName = sessionStorage.getItem("shelfRoomName");
+  const roomId = localStorage.getItem("shelfRoomId");
+  const roomName = localStorage.getItem("shelfRoomName");
   const showRoomBadge = !!roomId && !roomId.startsWith("PERSONAL_");
   const showRoomOnlineCount =
     showRoomBadge && typeof roomOnlineCount === "number";
@@ -30,8 +30,8 @@ export default function Navbar({ roomOnlineCount = null }) {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    sessionStorage.removeItem("shelfRoomId");
-    sessionStorage.removeItem("shelfRoomName");
+    localStorage.removeItem("shelfRoomId");
+    localStorage.removeItem("shelfRoomName");
     navigate("/login");
   };
 
