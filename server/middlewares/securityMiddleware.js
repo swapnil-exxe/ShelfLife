@@ -65,7 +65,7 @@ export const sanitizeAndValidateInput = (req, res, next) => {
           }
         }
 
-        if (key === "originalUrl") {
+        if (key === "url" || key === "originalUrl") {
           try {
             const parsedUrl = new URL(trimmed);
             if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
@@ -90,7 +90,8 @@ export const sanitizeAndValidateInput = (req, res, next) => {
 
         // 3. HTML Sanitization for fields rendered in UI
         // We do NOT escape sensitive system strings (passwords, emails, raw urls)
-        if (key !== "password" && key !== "email" && key !== "originalUrl") {
+        const isUrlField = key === "url" || key === "originalUrl" || key === "successorUrl" || key.toLowerCase().endsWith("url");
+        if (key !== "password" && key !== "email" && !isUrlField) {
           obj[key] = escapeHtml(trimmed);
         } else {
           obj[key] = trimmed;
