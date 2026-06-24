@@ -8,18 +8,19 @@ import Link from "../models/Link.js";
 // @access  Public
 export const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
+  const normalizedEmail = email?.toLowerCase().trim();
 
   try {
     // Check if user already exists
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ email: normalizedEmail });
     if (user) {
       return res.status(400).json({ message: "User already exists" });
     }
 
     // Create new user instance
     user = new User({
-      username,
-      email,
+      username: username?.trim(),
+      email: normalizedEmail,
       password,
     });
 
@@ -59,10 +60,11 @@ export const registerUser = async (req, res) => {
 // @access  Public
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
+  const normalizedEmail = email?.toLowerCase().trim();
 
   try {
     // Check if user exists
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.status(400).json({ message: "Email is not registered. Please sign up first." });
     }
