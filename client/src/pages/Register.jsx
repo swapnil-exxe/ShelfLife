@@ -259,7 +259,16 @@ const Register = () => {
         "Registration error:",
         err.response ? err.response.data : err.message,
       );
-      const errMsg = err.response?.data?.message || err.response?.data || "Something went wrong. Please check your inputs.";
+      let errMsg = "Something went wrong. Please check your inputs.";
+      if (err.response?.data) {
+        if (typeof err.response.data === "string" && (err.response.data.includes("<html") || err.response.data.includes("<!DOCTYPE"))) {
+          errMsg = "Internal server error. Please try again later.";
+        } else if (err.response.data.message) {
+          errMsg = err.response.data.message;
+        } else if (typeof err.response.data === "string") {
+          errMsg = err.response.data;
+        }
+      }
       setError(errMsg);
     }
   };

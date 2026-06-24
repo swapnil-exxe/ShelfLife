@@ -39,6 +39,12 @@ export const sanitizeAndValidateInput = (req, res, next) => {
     for (const key in obj) {
       if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
 
+      // 1. Prevent NoSQL Injection: delete properties starting with $ or containing .
+      if (key.startsWith("$") || key.includes(".")) {
+        delete obj[key];
+        continue;
+      }
+
       const value = obj[key];
 
       if (typeof value === "string") {

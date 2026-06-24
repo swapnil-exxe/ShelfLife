@@ -6,7 +6,6 @@ import http from "http";
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import helmet from "helmet";
-import mongoSanitize from "express-mongo-sanitize";
 import userRoutes from "./routes/userRoutes.js";
 import linkRoutes from "./routes/linkRoutes.js";
 import roomRoutes from "./routes/roomRoutes.js"; // ← NEW
@@ -34,9 +33,6 @@ app.locals.io = io;
 
 app.use(express.json());
 app.use(cors());
-
-// Prevent NoSQL Injection
-app.use(mongoSanitize());
 
 // Sanitize HTML and validate types/sizes of all input fields
 app.use(sanitizeAndValidateInput);
