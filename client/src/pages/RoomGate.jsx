@@ -4,6 +4,17 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import FloatingOrbs from "../components/FloatingOrbs";
+import { useSocket } from "../hooks/useSocket";
+
+function getUserIdFromToken(token) {
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload?.user?.id || null;
+  } catch {
+    return null;
+  }
+}
 
 // ─── ROOM ID DISPLAY ──────────────────────────────────────────────────────────
 function RoomIdDisplay({ roomId }) {
@@ -104,6 +115,29 @@ function RoomIdDisplay({ roomId }) {
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 export default function RoomGate() {
+  const token = localStorage.getItem("token");
+  const tokenUserId = getUserIdFromToken(token);
+  const expectedPersonalId = tokenUserId ? `PERSONAL_${tokenUserId}` : null;
+  const storedRoomId = localStorage.getItem("shelfRoomId");
+  const storedRoomName = localStorage.getItem("shelfRoomName");
+
+  const shouldUsePersonalShelf =
+    !!expectedPersonalId &&
+    (!storedRoomId ||
+      storedRoomId.startsWith("PERSONAL_") ||
+      storedRoomName === "My Personal Shelf");
+
+  const roomId = shouldUsePersonalShelf
+    ? expectedPersonalId
+    : (storedRoomId ?? null);
+  const roomName = shouldUsePersonalShelf
+    ? "My Personal Shelf"
+    : (storedRoomName ?? null);
+  const isPersonalSpace =
+    shouldUsePersonalShelf || roomName === "My Personal Shelf";
+
+  const { onlineCount } = useSocket(roomId);
+
   const navigate = useNavigate();
   const [tab, setTab] = useState("join"); // "join" | "create" | "remix"
   const [error, setError] = useState("");
@@ -127,9 +161,6 @@ export default function RoomGate() {
   const [forkPublic, setForkPublic] = useState(false);
   const [lineageData, setLineageData] = useState(null);
   const [loadingPublicRooms, setLoadingPublicRooms] = useState(false);
-
-  const token = localStorage.getItem("token");
-
   const fetchPublicRooms = async () => {
     setLoadingPublicRooms(true);
     try {
@@ -317,7 +348,7 @@ export default function RoomGate() {
       `}</style>
 
       {/* Premium Navbar */}
-      <Navbar />
+      <Navbar roomOnlineCount={isPersonalSpace ? null : onlineCount} />
 
       {/* Cinematic Background */}
       <div className="floating-particles" />

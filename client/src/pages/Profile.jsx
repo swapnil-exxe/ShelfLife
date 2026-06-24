@@ -2,6 +2,17 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import FloatingOrbs from "../components/FloatingOrbs";
+import { useSocket } from "../hooks/useSocket";
+
+function getUserIdFromToken(token) {
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload?.user?.id || null;
+  } catch {
+    return null;
+  }
+}
 
 const formatDate = (value) => {
   if (!value) return "Unknown";
@@ -87,6 +98,29 @@ export default function Profile() {
   const token = useMemo(() => localStorage.getItem("token"), []);
   const hasToken = Boolean(token);
 
+  // Decode token to get userId for personal space roomId
+  const tokenUserId = useMemo(() => getUserIdFromToken(token), [token]);
+  const expectedPersonalId = tokenUserId ? `PERSONAL_${tokenUserId}` : null;
+  const storedRoomId = localStorage.getItem("shelfRoomId");
+  const storedRoomName = localStorage.getItem("shelfRoomName");
+
+  const shouldUsePersonalShelf =
+    !!expectedPersonalId &&
+    (!storedRoomId ||
+      storedRoomId.startsWith("PERSONAL_") ||
+      storedRoomName === "My Personal Shelf");
+
+  const roomId = shouldUsePersonalShelf
+    ? expectedPersonalId
+    : (storedRoomId ?? null);
+  const roomName = shouldUsePersonalShelf
+    ? "My Personal Shelf"
+    : (storedRoomName ?? null);
+  const isPersonalSpace =
+    shouldUsePersonalShelf || roomName === "My Personal Shelf";
+
+  const { onlineCount } = useSocket(roomId);
+
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(hasToken);
   const [error, setError] = useState(hasToken ? "" : "No active session");
@@ -101,7 +135,7 @@ export default function Profile() {
 
       try {
         const response = await axios.get(
-          "http://localhost:5001/api/users/profile",
+          "/api/users/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -183,7 +217,7 @@ export default function Profile() {
         }
       `}</style>
       <FloatingOrbs count={7} />
-      <Navbar />
+      <Navbar roomOnlineCount={isPersonalSpace ? null : onlineCount} />
 
       <main
         style={{

@@ -4,6 +4,17 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import ScrollAnimationCanvas from "../components/ScrollAnimationCanvas";
 import FloatingOrbs from "../components/FloatingOrbs";
+import { useSocket } from "../hooks/useSocket";
+
+function getUserIdFromToken(token) {
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload?.user?.id || null;
+  } catch {
+    return null;
+  }
+}
 
 const getCreatedDaysAgo = (createdAt) => {
   const createdTime = new Date(createdAt).getTime();
@@ -225,6 +236,29 @@ function GraveyardCard({ card, index, onRestore, onDelete }) {
 
 // ─── GRAVEYARD PAGE ──────────────────────────────────────────────────────────
 export default function Graveyard() {
+  const token = localStorage.getItem("token");
+  const tokenUserId = getUserIdFromToken(token);
+  const expectedPersonalId = tokenUserId ? `PERSONAL_${tokenUserId}` : null;
+  const storedRoomId = localStorage.getItem("shelfRoomId");
+  const storedRoomName = localStorage.getItem("shelfRoomName");
+
+  const shouldUsePersonalShelf =
+    !!expectedPersonalId &&
+    (!storedRoomId ||
+      storedRoomId.startsWith("PERSONAL_") ||
+      storedRoomName === "My Personal Shelf");
+
+  const roomId = shouldUsePersonalShelf
+    ? expectedPersonalId
+    : (storedRoomId ?? null);
+  const roomName = shouldUsePersonalShelf
+    ? "My Personal Shelf"
+    : (storedRoomName ?? null);
+  const isPersonalSpace =
+    shouldUsePersonalShelf || roomName === "My Personal Shelf";
+
+  const { onlineCount } = useSocket(roomId);
+
   const [cards, setCards] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const containerRef = useRef(null);
@@ -237,8 +271,14 @@ export default function Graveyard() {
     const fetchLinks = async () => {
       try {
         const token = localStorage.getItem("token");
-        const { data } = await axios.get("/api/links?archived=true", {
+        const params = {
+          archived: true,
+          ...(roomId ? { roomId } : {}),
+          ...(isPersonalSpace ? { scope: "personal" } : {}),
+        };
+        const { data } = await axios.get("/api/links", {
           headers: { Authorization: `Bearer ${token}` },
+          params,
         });
         setCards(Array.isArray(data) ? data : []);
       } catch (error) {
@@ -247,7 +287,7 @@ export default function Graveyard() {
       }
     };
     fetchLinks();
-  }, []);
+  }, [roomId, isPersonalSpace]);
 
   const handleRestore = async (id) => {
     try {
@@ -302,7 +342,7 @@ export default function Graveyard() {
         }
       `}</style>
 
-      <Navbar />
+      <Navbar roomOnlineCount={isPersonalSpace ? null : onlineCount} />
 
       <div
         ref={containerRef}

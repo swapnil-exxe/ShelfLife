@@ -9,9 +9,13 @@ export default function Navbar({ roomOnlineCount = null }) {
   const location = useLocation();
   const roomId = localStorage.getItem("shelfRoomId");
   const roomName = localStorage.getItem("shelfRoomName");
-  const showRoomBadge = !!roomId && !roomId.startsWith("PERSONAL_");
+  const hasActiveSpace = !!roomId;
+  const isPersonal = !roomId || roomId.startsWith("PERSONAL_") || roomName === "My Personal Shelf";
+  const displayRoomName = isPersonal ? "My Personal Shelf" : (roomName || "Unnamed Shelf");
+  const displayRoomId = isPersonal ? null : roomId;
+
   const showRoomOnlineCount =
-    showRoomBadge && typeof roomOnlineCount === "number";
+    !isPersonal && typeof roomOnlineCount === "number";
   const roomOnlineLabel =
     roomOnlineCount === 1
       ? "1 person in room"
@@ -186,7 +190,7 @@ export default function Navbar({ roomOnlineCount = null }) {
         ))}
       </div>
 
-      {showRoomBadge && (
+      {hasActiveSpace && (
         <div
           style={{
             display: "flex",
@@ -195,8 +199,12 @@ export default function Navbar({ roomOnlineCount = null }) {
             marginRight: "18px",
             padding: "8px 14px",
             borderRadius: "14px",
-            border: "1px solid rgba(0,214,255,0.2)",
-            background: "rgba(0,214,255,0.08)",
+            border: isPersonal
+              ? "1px solid rgba(0,214,255,0.2)"
+              : "1px solid rgba(255, 59, 48, 0.2)",
+            background: isPersonal
+              ? "rgba(0,214,255,0.08)"
+              : "rgba(255, 59, 48, 0.08)",
             boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
             minWidth: 0,
           }}
@@ -207,11 +215,11 @@ export default function Navbar({ roomOnlineCount = null }) {
               fontSize: 12,
               fontWeight: 700,
               letterSpacing: "0.08em",
-              color: "#00D6FF",
+              color: isPersonal ? "#00D6FF" : "#FF3B30",
               whiteSpace: "nowrap",
             }}
           >
-            ROOM
+            {isPersonal ? "PERSONAL" : "ROOM"}
           </span>
           <span
             style={{
@@ -223,21 +231,23 @@ export default function Navbar({ roomOnlineCount = null }) {
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
             }}
-            title={roomName || "Unnamed Shelf"}
+            title={displayRoomName}
           >
-            {roomName || "Unnamed Shelf"}
+            {displayRoomName}
           </span>
-          <span
-            style={{
-              fontFamily: "'Inter', sans-serif",
-              fontSize: 12,
-              fontWeight: 600,
-              color: "rgba(255,255,255,0.65)",
-              whiteSpace: "nowrap",
-            }}
-          >
-            #{roomId}
-          </span>
+          {!isPersonal && (
+            <span
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 12,
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.65)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              #{displayRoomId}
+            </span>
+          )}
         </div>
       )}
 
