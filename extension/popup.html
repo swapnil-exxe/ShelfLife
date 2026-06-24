@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  
+  <div class="glass-container">
+    <div class="header">
+      <img src="icon.png" alt="ShelfLife" class="logo">
+      <h1>ShelfLife</h1>
+    </div>
+    
+    <div class="content" id="mainContent">
+      <div class="url-card">
+        <div class="url-icon">🔗</div>
+        <div class="url-text" id="currentUrl">Loading...</div>
+      </div>
+      <button id="saveBtn" class="primary-btn">Save to Dashboard</button>
+    </div>
+
+    <div class="status hidden" id="statusMessage">
+      <div class="spinner" id="spinner"></div>
+      <p id="statusText">Saving...</p>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
