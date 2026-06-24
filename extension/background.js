@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       try {
-        const response = await fetch("http://localhost:5001/api/links/ingest", {
+        const response = await fetch("http://127.0.0.1:5001/api/links/ingest", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
