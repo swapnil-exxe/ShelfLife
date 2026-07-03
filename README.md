@@ -1,69 +1,71 @@
-# 🌿 SHELFLIFE
+# 🌿 SHELFLIFE — The Resurrection of the Living Archive
 
-**The Resurrection of the Living Archive.**
+React 19 &middot; Vite 8 &middot; Node.js &middot; Socket.io &middot; MongoDB Atlas &middot; Chrome Extension API
 
 SHELFLIFE is a social, AI-augmented curation engine built to fight the "Digital Graveyard" of forgotten tabs and broken bookmarks. Instead of static lists, SHELFLIFE creates a living, breathing ecosystem that organizes itself, summarizes the noise, and physically decays if neglected.
 
 ---
 
-## ✨ Core Features
-
-### 1. 🤖 Autonomous AI Ingestion & Web Scraping
-*   **What it does:** When you submit a URL, the backend crawls the web page content in real-time.
-*   **How it works:**
-    *   The link controller fetches the raw HTML using `node-fetch` and parses the main body text using [cheerio](https://cheerio.js.org/).
-    *   It communicates with the Groq Cloud API via the `groq-sdk` using the `llama-3.3-70b-versatile` model to generate an accurate, concise 3-sentence executive summary.
-    *   If no Groq API Key is configured, it falls back gracefully to a metadata crawler that parses standard HTML open-graph tags.
-
-### 2. ⏳ Biological Decay & Compost Heap (Graveyard)
-*   **What it does:** Simulates natural biological decay on your cards based on their age and activity.
-*   **How it works:**
-    *   The system uses dynamic age decay calculation located in [linkController.js](file:///Users/swapnil/Downloads/ShelfLife-main/server/controllers/linkController.js).
-    *   **Grace Period (0-14 days):** Active links retain their full opacity and size.
-    *   **Decay Phase (14-30 days):** Links that have not been clicked or updated start to desaturate and shrink proportionally from `0%` to `100%` decay.
-    *   **Compost Heap (30+ days):** Links that reach `100%` decay are considered "dead" and are automatically archived and moved to the public Compost Heap (Graveyard).
-    *   **Resurrection:** Users can visit the Graveyard and resurrect cards to bring them back to life on the active shelf, resetting their decay counter to `0`.
-
-### 3. 🎨 Semantic Vibe-Engine
-*   **What it does:** Auto-classifies bookmarks into visually distinct "Mood Pills" and tags.
-*   **How it works:**
-    *   The LLM analyzes the sentiment, category, and tone of the scraped text.
-    *   It tags each bookmark with vibes (e.g., `Educational`, `Chaotic`, `Deep Dive`, `Vaporwave`, `Productivity`) and automatically sets a corresponding emoji icon (e.g., 📘, ⚡, 🧠, 🌊).
-
-### 4. 🧠 Grounded Context Feed (AI Sweep)
-*   **What it does:** Periodically scans your bookmarked cards to check if the referenced web content has changed, become stale, or been succeeded by a newer resource.
-*   **How it works:**
-    *   Runs in [contextFeedService.js](file:///Users/swapnil/Downloads/ShelfLife-main/server/services/contextFeedService.js) via a recurring background worker sweep.
-    *   Uses Groq to compare saved summaries against fresh web results, assigning a confidence rating and categorizing each card's status as `up-to-date`, `updated`, `successor-found`, `stale`, or `unclear`.
-    *   If a newer version exists, it identifies the successor URL and links it dynamically on the card detail modal.
-
-### 5. 🔌 Real-Time Synapse (Multiplayer Collaboration)
-*   **What it does:** A multiplayer shared workspace where teams can curate shelves together in real-time.
-*   **How it works:**
-    *   Powered by [socket.io](https://socket.io/) integration in [server.js](file:///Users/swapnil/Downloads/ShelfLife-main/server/server.js).
-    *   All edits, additions, movements, and archives are instantly broadcasted to all users in the same room.
-    *   **Shelf Weather:** Tracks per-room mouse movements, clicks, and actions. High room activity sets the shelf weather to `STORMY`, moderate activity to `BREEZY`, and idle rooms to `FOGGY`.
+## ✨ Hackathon Achievement
+⚡ **Built in a 24-hour sprint by a 4-member team**, engineering a full React web application, Express backend API, Socket.io multiplayer synchronization, and a custom Chrome Extension from scratch.
 
 ---
 
-## 🛠️ Tech Stack & Key Libraries
+## ✨ Live Demo & Local Credentials
+Experience the application running locally or deploy it across cloud systems:
 
-### Client (Frontend)
-*   **Framework:** React 19 with Vite
-*   **Animations:** Framer Motion (for smooth micro-animations and physics-based card decay)
-*   **Web Graphics:** OGL (WebGL framework for rendering interactive backgrounds)
-*   **Routing:** React Router DOM (v7)
-*   **Real-time Communication:** Socket.io-client
-*   **HTTP Requests:** Axios
+*   **🌐 Frontend Client URL**: `http://localhost:5173`
+*   **⚙️ Backend API Server**: `http://localhost:5001`
+*   **📦 Cloud Database**: MongoDB Atlas Sandbox
 
-### Server (Backend)
-*   **Runtime:** Node.js (ES Modules)
-*   **Framework:** Express (v5)
-*   **Database:** MongoDB Atlas via Mongoose
-*   **AI Integration:** Groq SDK (`groq-sdk`)
-*   **Web Scraping:** Cheerio & Node-Fetch
-*   **Authentication:** JSON Web Tokens (JWT) & bcryptjs
-*   **Process Manager:** Nodemon (for development hot-reloads)
+### 🔑 Test Access Credentials
+You can log in to the portal using this pre-registered account to explore features:
+*   **Email Address**: `student@gmail.com`
+*   **Password**: `student123`
+
+---
+
+## 🌟 Real-World Problems Solved
+
+### 1. The "Digital Graveyard" (Tab Overload & Bookmark Rot)
+*   **Problem**: Users open dozens of tabs to "read later," only for those tabs to gather dust, clutter browser memory, or become completely forgotten.
+*   **Solution**: SHELFLIFE implements **Biological Decay**. If you ignore a saved link, it slowly desaturates and shrinks over a 30-day period. At 100% decay, it is moved to the public **Compost Heap (Graveyard)**. Cards can be "resurrected" back to the active shelf, keeping your dashboard organic and clean.
+
+### 2. High-Noise, Zero-Context Web Bookmarks
+*   **Problem**: Copy-pasting links leaves you with long, unreadable URLs or generic titles, offering no insight into the webpage content at a glance.
+*   **Solution**: When a URL is ingested, SHELFLIFE automatically scrapes the raw HTML using `cheerio` and uses **Groq AI (Llama-3.3-70b)** to generate a precise 3-sentence executive summary and assign a semantic mood icon.
+
+### 3. Fragmented & Static Link Sharing
+*   **Problem**: Sharing bookmarks in messenger group chats is disorganized, making it impossible to curate collections collaboratively in real-time.
+*   **Solution**: Integrated **Collaborative Rooms** powered by Socket.io. Multiple users can join a room to curate shelves together in real-time. Room activity is tracked to calculate **Shelf Weather** (idle rooms are `FOGGY`, active rooms are `BREEZY`, and heavy team editing triggers `STORMY` weather with rain overlays).
+
+### 4. Outdated & Dead Links (Stale Resources)
+*   **Problem**: Web articles, documentation, or code libraries change, but your saved bookmarks remain frozen in their original state.
+*   **Solution**: The **Grounded Context Feed** sweeps the database periodically, checks if the saved URL's page content has evolved, determines if a newer resource exists, and displays updates (or links to successor pages) directly in the card details.
+
+---
+
+## ⚡ Performance & Engineering Optimizations
+
+*   **Socket.io Multi-Room Sync**: Handlers manage room joining and resource sharing. All additions, deletions, projects, and drag-and-drop actions broadcast instantly to all socket nodes in the room.
+*   **Dynamic HSL Color Engine**: Badges and background glows utilize a dynamic color-hashing fallback. Custom genres (like *Tech*, *Scientific*, *Creative*) generate unique HSL hues based on their names to create a distinct layout color code.
+*   **Chrome Extension Hotkey Ingestion**: A custom extension with a popup form and background service worker allows one-click link submissions. It captures your current active tab title and URL, sending it straight to your personal dashboard.
+*   **AI Fallback Mechanisms**: If the Perplexity or Groq API limit is exceeded, the server falls back to an HTML metadata crawler to extract Open Graph tags (`og:description`, `og:title`) so URLs are never lost.
+*   **Advanced Webkit Autofill Fixes**: Custom CSS selectors override standard browser autofill behaviors, preventing browser password managers from turning input text black in dark mode templates.
+
+---
+
+## 🛠️ Technology Stack & Languages
+
+| Component | Technology | Use Case |
+| :--- | :--- | :--- |
+| **Frontend** | React 19 (Vite 8) | Single Page Application UI with React Router v7 and Framer Motion. |
+| **Extension** | Chrome Extension V3 | Content script & background workers for one-click bookmarking. |
+| **Styling** | Vanilla CSS + Canvas | Sleek dark-mode aesthetic with hardware-accelerated star particles. |
+| **Multiplayer** | Socket.io | Real-time workspace synchronization and Shelf Weather tracking. |
+| **Backend** | Node.js + Express v5 | RESTful API server with rate-limiting and input sanitization. |
+| **Database** | MongoDB Atlas | Managed cloud database with Mongoose indexes. |
+| **AI Crawler** | Groq & Cheerio | Real-time scraper with automated Llama summaries. |
 
 ---
 
@@ -80,80 +82,62 @@ ShelfLife/
 │   │   └── index.css           # Global CSS variables and styles
 │   └── vite.config.js          # Vite config (dev server proxy to 127.0.0.1:5001)
 │
-├── server/                     # Backend Node/Express Server
-│   ├── controllers/            # API controller handlers (links, rooms, users, projects)
-│   ├── middlewares/            # JWT auth checking middlewares
-│   ├── models/                 # Mongoose schemas (Link, Room, User, Project)
-│   ├── routes/                 # Express API routes
-│   ├── services/               # Background AI Context Sweep worker
-│   ├── server.js               # Entry point, Express and Socket.io setups
-│   └── .env                    # Local environment variables
+├── extension/                  # Chrome Extension V3
+│   ├── background.js           # Background service worker for active tab capture
+│   ├── content.js              # Content scripts
+│   ├── manifest.json           # Extension manifest file
+│   ├── popup.html              # Extension popup layout
+│   └── popup.js                # Extension popup logic
+│
+└── server/                     # Backend Node/Express Server
+    ├── controllers/            # API controller handlers (links, rooms, users, projects)
+    ├── middlewares/            # JWT auth checking middlewares
+    ├── models/                 # Mongoose schemas (Link, Room, User, Project)
+    ├── routes/                 # Express API routes
+    ├── services/               # Background AI Context Sweep worker
+    ├── server.js               # Entry point, Express and Socket.io setups
+    └── .env                    # Local environment variables
 ```
 
 ---
 
-## 🚀 Getting Started
+## 📂 Core Database Schema Models
 
-### Prerequisites
-*   Node.js (v18 or higher recommended)
-*   A MongoDB Atlas cluster database
-
-### 1. Backend Configuration
-Navigate to the server directory and create a [server/.env](file:///Users/swapnil/Downloads/ShelfLife-main/server/.env) file:
-```bash
-cd server
-npm install
-```
-
-Configure your `.env` variables inside [server/.env](file:///Users/swapnil/Downloads/ShelfLife-main/server/.env):
-```env
-PORT=5001
-MONGO_URI=mongodb+srv://swapnil15x_db_user:ShelfLife@cluster0.ko5kzru.mongodb.net/shelflife_db?appName=Cluster0
-JWT_SECRET=your_jwt_secret_key_here
-GROQ_API_KEY=your_groq_api_key_here
-```
-
-Start the backend server in development mode:
-```bash
-npm run dev
-```
-The server will start on `http://127.0.0.1:5001` and connect to the MongoDB Atlas database.
-
-### 2. Frontend Configuration
-Navigate to the client directory:
-```bash
-cd ../client
-npm install
-```
-
-Start the React development server:
-```bash
-npm run dev
-```
-The frontend dev server will launch on `http://localhost:5173`. Any API calls to `/api/*` will automatically be proxied to the backend server at `http://127.0.0.1:5001` as configured in [vite.config.js](file:///Users/swapnil/Downloads/ShelfLife-main/client/vite.config.js).
+*   **User Model**: Role-based access tokens with encrypted passwords using `bcryptjs` and session tokens.
+*   **Link Model**: Holds URL, title, executive summaries, vibe pills, and the contextFeed tracking object (status: `pending`, `success`, `error`).
+*   **Room Model**: Defines collaborative room IDs, owner connections, public accessibility flags, and lineages.
+*   **Project Model**: Groups links into custom project sub-shelves on your dashboard to keep folders organized.
 
 ---
 
-## ⚙️ How the Ingestion & Decay Engine Works
+## 🎨 UI/UX Design & Starwarp Aesthetic
 
-### Database Schema - [server/models/Link.js](file:///Users/swapnil/Downloads/ShelfLife-main/server/models/Link.js)
-Each link document tracks `decay`, `isArchived`, `roomId`, and `contextFeed` parameters.
+*   **Starwarp Hyperspeed Canvas**: The home and login screens feature a canvas-based star warp animation that dynamically speeds up or slows down based on user actions.
+*   **Cursor Spotlight hover effects**: Glassmorphic cards dynamically tilt and track mouse coordinates, projecting a subtle color-coded glow matching the card's genre.
+*   **Password Visibility (Eye Icon)**: Interactive visibility toggles built inside all login, register, and room forms using premium feather SVG vectors.
 
-### Decay Logic - [server/controllers/linkController.js](file:///Users/swapnil/Downloads/ShelfLife-main/server/controllers/linkController.js)
-```javascript
-const FADE_START_DAYS = 14;
-const FADE_END_DAYS = 30;
+---
 
-const baseTime = new Date(link.updatedAt || link.createdAt).getTime();
-const ageDays = Math.max(0, Math.floor((Date.now() - baseTime) / dayMs));
+## 📅 24-Hour Development Timeline & Milestones
 
-let ageDecay = 0;
-if (ageDays >= FADE_END_DAYS) {
-  ageDecay = 100; // Will be automatically archived and moved to the Compost Heap
-} else if (ageDays > FADE_START_DAYS) {
-  ageDecay = Math.round(((ageDays - FADE_START_DAYS) / (FADE_END_DAYS - FADE_START_DAYS)) * 100);
-}
-```
+SHELFLIFE was built in a rapid 24-hour hackathon. Here is the sprint breakdown:
 
-### Real-Time Updates - [server/server.js](file:///Users/swapnil/Downloads/ShelfLife-main/server/server.js)
-Any interaction in a collaborative room emits real-time WebSocket events that synchronize state instantly across all online clients.
+### ⏱️ Hours 0 - 6: Architecture & Database Ingestion
+*   Established standard database schemas for `Link`, `User`, `Room`, and `Project`.
+*   Programmed the server routing and integrated `cheerio` parsing with Groq API pipelines to handle real-time metadata scraping.
+*   Configured the Vite React client wrapper.
+
+### ⏱️ Hours 6 - 12: Visual Systems & Extensions
+*   Coded the glassmorphic dark theme and integrated the WebGL Hyperspeed star warp canvas backgrounds.
+*   Created the Chrome Extension V3 setup (manifest, background worker, popup UI) enabling one-click tab capture.
+*   Implemented the password visibility eye toggles.
+
+### ⏱️ Hours 12 - 18: Real-Time Synapse & Shelf Weather
+*   Integrated Socket.io server listeners and React socket hook sub-routines.
+*   Programmed room synchronization so additions reflect instantly for all peers.
+*   Created the "Shelf Weather" engine, mapping idle mouse state calculations to weather statuses.
+
+### ⏱️ Hours 18 - 24: Grounded context sweeps & Security
+*   Developed the background scheduler (`contextFeedService.js`) to scan links for structural updates.
+*   Hardened Express endpoints against NoSQL injection, fixed helmet iframe policies, and resolved Vercel SPA routing problems.
+*   Ran code cleanup and verified zero-dependency builds.
