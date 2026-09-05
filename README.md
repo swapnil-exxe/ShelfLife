@@ -1,4 +1,4 @@
-# 🌿 SHELFLIFE — The Resurrection of the Living Archive
+# 🌿 SHELFLIFE — The Resurrection of the Living Archive 📈
 
 React 19 &middot; Vite 8 &middot; Node.js &middot; Socket.io &middot; MongoDB Atlas &middot; Chrome Extension API
 
