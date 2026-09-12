@@ -738,3 +738,62 @@ export const moveLinkToProject = async (req, res) => {
     return res.status(500).json({ message: "Server error moving link" });
   }
 };
+
+// ── Calculate Real-Time Link Expiration Decay ────────────────────────────────
+export const calculateLinkDecay = (createdAt) => {
+  const now = new Date();
+  const created = new Date(createdAt);
+  const diffDays = (now - created) / (1000 * 60 * 60 * 24);
+
+  if (diffDays <= 14) return { decayPercentage: 0, status: "Fresh", color: "green" };
+  if (diffDays <= 30) {
+    const percentage = Math.round(((diffDays - 14) / 16) * 100);
+    return { decayPercentage: percentage, status: "Fading", color: "yellow" };
+  }
+  return { decayPercentage: 100, status: "Expired", color: "red" };
+};
+
+// @desc    Update custom tags for a link
+// @route   PATCH /api/links/:id/tags
+// @access  Private
+export const updateLinkTags = async (req, res) => {
+  try {
+    const { tags } = req.body;
+
+    if (!Array.isArray(tags)) {
+      return res.status(400).json({ message: "Tags must be an array of strings" });
+    }
+
+    const sanitizedTags = Array.from(
+      new Set(
+        tags
+          .filter((t) => typeof t === "string")
+          .map((t) => t.trim().toLowerCase())
+          .filter((t) => t.length > 0 && t.length <= 30)
+      )
+    );
+
+    const link = await Link.findById(req.params.id);
+
+    if (!link) {
+      return res.status(404).json({ message: "Link not found" });
+    }
+
+    if (String(link.user) !== String(req.user.id)) {
+      return res.status(403).json({ message: "Not authorized to modify this link" });
+    }
+
+    link.tags = sanitizedTags;
+    await link.save();
+
+    return res.json({
+      message: "Tags updated successfully",
+      tags: link.tags,
+      decayInfo: calculateLinkDecay(link.createdAt),
+    });
+  } catch (error) {
+    console.error("Error updating link tags:", error);
+    return res.status(500).json({ message: "Server error updating tags" });
+  }
+};
+
