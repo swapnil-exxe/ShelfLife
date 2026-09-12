@@ -1,4 +1,10 @@
 {
+  "name": "shelflife",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "audit:health": "node scripts/audit_repo_health.js"
+  },
   "dependencies": {
     "date-fns": "^4.1.0",
     "groq-sdk": "^1.1.2"
