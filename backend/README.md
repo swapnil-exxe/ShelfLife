@@ -1,6 +1,11 @@
 # ⚙️ SHELFLIFE — Backend Services & REST API (`backend/`)
 
+[![Render Live](https://img.shields.io/badge/Render-Production%20Live-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://shelflife-67gn.onrender.com/api/health)
+
 The backend of **SHELFLIFE** powers the RESTful APIs, Socket.io real-time room synchronization, background context feed sweeps, user activity logging, and houses the **Python Scrapling Web Scraper microservice**.
+
+- **Production Live Backend URL**: [https://shelflife-67gn.onrender.com](https://shelflife-67gn.onrender.com)
+- **Live Health Diagnostics**: [https://shelflife-67gn.onrender.com/api/health/diagnostics](https://shelflife-67gn.onrender.com/api/health/diagnostics)
 
 ---
 
@@ -8,7 +13,7 @@ The backend of **SHELFLIFE** powers the RESTful APIs, Socket.io real-time room s
 
 ```text
 backend/
-├── .env                       # Environment variables (MONGO_URI, JWT_SECRET, GROQ_API_KEY)
+├── .env                       # Environment secrets (MONGO_URI, JWT_SECRET, GROQ_API_KEY)
 ├── package.json               # Backend Node.js dependencies (Express, Mongoose, Socket.io, Groq)
 ├── server.js                  # Entrypoint: Express HTTP server & Socket.io listeners
 ├── controllers/
@@ -97,13 +102,13 @@ PYTHONPATH=backend python3 backend/scraper/app.py
 - `PUT /api/admin/users/:id/role` — Update user role (`user` / `admin`)
 - `POST /api/admin/users/:id/force-logout` — Terminate all active sessions for a user
 - `GET /api/admin/activity` — Retrieve user audit logs & security events
-- `GET /api/admin/activity/export/csv` — Export activity logs to CSV format
+- `GET /api/admin/activity/export` — Export audit logs as formatted CSV spreadsheet
 
 ### Links & AI Summarization
 - `GET /api/links` — Fetch active links
-- `POST /api/links` — Submit new link (triggers Scrapling extraction & Groq AI summary)
+- `POST /api/links/ingest` — Ingest URL with Scrapling scraper & Groq AI summary
 - `DELETE /api/links/:id` — Move link to Compost Heap (Graveyard)
-- `PUT /api/links/:id/resurrect` — Restore link from Graveyard back to active shelf
+- `PUT /api/links/:id/restore` — Resurrect link from Graveyard back to active shelf
 
 ---
 
