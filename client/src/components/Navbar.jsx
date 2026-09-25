@@ -153,9 +153,9 @@ export default function Navbar({ roomOnlineCount = null }) {
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "36px",
-          flex: 1,
-          marginLeft: "60px",
+          gap: "20px",
+          marginLeft: "24px",
+          flexShrink: 0,
         }}
       >
         {navItems.map((item) => (
@@ -171,14 +171,15 @@ export default function Navbar({ roomOnlineCount = null }) {
                   : "rgba(255,255,255,0.50)",
               fontFamily: "'Inter', sans-serif",
               fontWeight: activeNav === item.id ? 600 : 400,
-              fontSize: "15px",
+              fontSize: "14px",
               cursor: "pointer",
               transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
               display: "flex",
               alignItems: "center",
-              gap: "8px",
+              gap: "6px",
               paddingBottom: "4px",
               position: "relative",
+              whiteSpace: "nowrap",
             }}
             onMouseOver={(e) => {
               if (activeNav !== item.id)
@@ -225,124 +226,139 @@ export default function Navbar({ roomOnlineCount = null }) {
         ))}
       </div>
 
-      {hasActiveSpace && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            marginRight: "18px",
-            padding: "8px 14px",
-            borderRadius: "14px",
-            border: isPersonal
-              ? "1px solid rgba(0,214,255,0.2)"
-              : "1px solid rgba(255, 59, 48, 0.2)",
-            background: isPersonal
-              ? "rgba(0,214,255,0.08)"
-              : "rgba(255, 59, 48, 0.08)",
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
-            minWidth: 0,
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "'Inter', sans-serif",
-              fontSize: 12,
-              fontWeight: 700,
-              letterSpacing: "0.08em",
-              color: isPersonal ? "#00D6FF" : "#FF3B30",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {isPersonal ? "PERSONAL" : "ROOM"}
-          </span>
-          <span
-            style={{
-              fontFamily: "'Inter', sans-serif",
-              fontSize: 13,
-              color: "rgba(255,255,255,0.9)",
-              maxWidth: 170,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-            title={displayRoomName}
-          >
-            {displayRoomName}
-          </span>
-          {!isPersonal && (
-            <span
-              style={{
-                fontFamily: "'Inter', sans-serif",
-                fontSize: 12,
-                fontWeight: 600,
-                color: "rgba(255,255,255,0.65)",
-                whiteSpace: "nowrap",
-              }}
-            >
-              #{displayRoomId}
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Live badge */}
+      {/* Right Action Controls & Status */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 10,
-          marginRight: "24px",
+          gap: "12px",
+          flexShrink: 0,
+          marginLeft: "auto",
         }}
       >
-        <span
+        {hasActiveSpace && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "6px 12px",
+              borderRadius: "12px",
+              border: isPersonal
+                ? "1px solid rgba(0,214,255,0.2)"
+                : "1px solid rgba(255, 59, 48, 0.2)",
+              background: isPersonal
+                ? "rgba(0,214,255,0.08)"
+                : "rgba(255, 59, 48, 0.08)",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                color: isPersonal ? "#00D6FF" : "#FF3B30",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {isPersonal ? "PERSONAL" : "ROOM"}
+            </span>
+            <span
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 12,
+                color: "rgba(255,255,255,0.9)",
+                maxWidth: 130,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+              title={displayRoomName}
+            >
+              {displayRoomName}
+            </span>
+            {!isPersonal && (
+              <span
+                style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: "rgba(255,255,255,0.65)",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                #{displayRoomId}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Live badge */}
+        <div
           style={{
-            width: 6,
-            height: 6,
-            borderRadius: "50%",
-            background: themeColor,
-            boxShadow: `0 0 10px ${themeColor}`,
-            animation: "pulse 2s infinite",
-          }}
-        />
-        <span
-          style={{
-            fontFamily: "'Inter', sans-serif",
-            fontSize: 13,
-            color: "rgba(255,255,255,0.60)",
-            fontWeight: 400,
-            letterSpacing: "0.2px",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "4px 8px",
+            whiteSpace: "nowrap",
           }}
         >
-          {showRoomOnlineCount ? roomOnlineLabel : "System Online"}
-        </span>
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: themeColor,
+              boxShadow: `0 0 10px ${themeColor}`,
+              animation: "pulse 2s infinite",
+            }}
+          />
+          <span
+            style={{
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 12,
+              color: "rgba(255,255,255,0.60)",
+              fontWeight: 400,
+              letterSpacing: "0.2px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {showRoomOnlineCount ? roomOnlineLabel : "System Online"}
+          </span>
+        </div>
+
+        <button
+          onClick={handleLogout}
+          style={{
+            padding: "7px 16px",
+            borderRadius: "12px",
+            border: "1px solid rgba(255,255,255,0.12)",
+            background: "rgba(255,255,255,0.05)",
+            color: "rgba(255,255,255,0.92)",
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 500,
+            fontSize: "13px",
+            cursor: "pointer",
+            transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+            whiteSpace: "nowrap",
+            flexShrink: 0,
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.12)";
+            e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)";
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+            e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
+          }}
+        >
+          Logout
+        </button>
       </div>
-      <button
-        onClick={handleLogout}
-        style={{
-          padding: "8px 20px",
-          borderRadius: "14px",
-          border: "1px solid rgba(255,255,255,0.1)",
-          background: "rgba(255,255,255,0.03)",
-          color: "rgba(255,255,255,0.92)",
-          fontFamily: "'Inter', sans-serif",
-          fontWeight: 500,
-          fontSize: "14px",
-          cursor: "pointer",
-          transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)",
-        }}
-        onMouseOver={(e) => {
-          e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-          e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
-        }}
-        onMouseOut={(e) => {
-          e.currentTarget.style.background = "rgba(255,255,255,0.03)";
-          e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
-        }}
-      >
-        Logout
-      </button>
     </nav>
     <ExtensionModal isOpen={isExtensionModalOpen} onClose={() => setIsExtensionModalOpen(false)} />
     </>
