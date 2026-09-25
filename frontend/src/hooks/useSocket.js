@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { io } from "socket.io-client";
 
-const SOCKET_URL = "http://127.0.0.1:5001";
+const SOCKET_URL = import.meta.env.VITE_API_URL || "https://shelflife-67gn.onrender.com";
 
 export function useSocket(roomId) {
   const [onlineCount, setOnlineCount] = useState(0);

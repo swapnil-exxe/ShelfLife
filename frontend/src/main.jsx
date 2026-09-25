@@ -5,6 +5,8 @@ import axios from "axios";
 import App from "./App";
 import "./index.css";
 
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || "https://shelflife-67gn.onrender.com";
+
 axios.interceptors.response.use(
   (response) => response,
   (error) => {

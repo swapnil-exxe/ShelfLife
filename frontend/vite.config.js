@@ -7,8 +7,9 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:5001",
+        target: process.env.VITE_API_URL || "https://shelflife-67gn.onrender.com",
         changeOrigin: true,
+        secure: false,
       },
     },
   },
