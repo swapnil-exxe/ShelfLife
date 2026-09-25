@@ -88,279 +88,310 @@ export default function Navbar({ roomOnlineCount = null }) {
 
   return (
     <>
+      <style>{`
+        .shelflife-navbar {
+          box-sizing: border-box !important;
+        }
+        .nav-link-btn {
+          font-size: 13px !important;
+          padding: 4px 8px !important;
+          gap: 5px !important;
+        }
+        .nav-status-label {
+          display: inline-block;
+        }
+        @media (max-width: 1024px) {
+          .nav-link-text {
+            display: none;
+          }
+          .nav-status-label {
+            display: none;
+          }
+        }
+      `}</style>
       <nav
-      style={{
-        position: "fixed",
-        top: scrolled ? 24 : 0,
-        left: scrolled ? "50%" : 0,
-        transform: scrolled ? "translateX(-50%)" : "none",
-        width: scrolled ? "calc(100% - 48px)" : "100%",
-        maxWidth: scrolled ? "1200px" : "100%",
-        zIndex: 1000,
-        height: 72,
-        padding: "0 32px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        background: scrolled
-          ? "rgba(255, 255, 255, 0.02)"
-          : "rgba(255, 255, 255, 0.00)",
-        backdropFilter: scrolled ? "blur(32px) saturate(150%)" : "none",
-        WebkitBackdropFilter: scrolled ? "blur(32px) saturate(150%)" : "none",
-        borderRadius: scrolled ? "36px" : "0px",
-        border: scrolled
-          ? "1px solid rgba(255, 255, 255, 0.06)"
-          : "1px solid transparent",
-        borderBottom: !scrolled
-          ? "1px solid rgba(255,255,255,0.04)"
-          : "1px solid rgba(255, 255, 255, 0.06)",
-        boxShadow: scrolled
-          ? "0 24px 48px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)"
-          : "none",
-        transition: "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
-      }}
-    >
-      {/* Logo */}
-      <div
-        onClick={() => navigate("/")}
+        className="shelflife-navbar"
         style={{
+          position: "fixed",
+          top: scrolled ? 16 : 0,
+          left: scrolled ? "50%" : 0,
+          transform: scrolled ? "translateX(-50%)" : "none",
+          width: scrolled ? "calc(100% - 32px)" : "100%",
+          maxWidth: scrolled ? "1240px" : "100%",
+          zIndex: 1000,
+          height: 64,
+          padding: "0 20px",
           display: "flex",
           alignItems: "center",
-          cursor: "pointer",
-          transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-        }}
-        onMouseOver={(e) => {
-          e.currentTarget.style.transform = "scale(1.05)";
-        }}
-        onMouseOut={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
+          justifyContent: "space-between",
+          background: scrolled
+            ? "rgba(10, 14, 23, 0.85)"
+            : "rgba(7, 9, 14, 0.75)",
+          backdropFilter: "blur(24px) saturate(160%)",
+          WebkitBackdropFilter: "blur(24px) saturate(160%)",
+          borderRadius: scrolled ? "24px" : "0px",
+          border: scrolled
+            ? "1px solid rgba(255, 255, 255, 0.08)"
+            : "1px solid transparent",
+          borderBottom: !scrolled
+            ? "1px solid rgba(255,255,255,0.06)"
+            : "1px solid rgba(255, 255, 255, 0.08)",
+          boxShadow: scrolled
+            ? "0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)"
+            : "none",
+          transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+          boxSizing: "border-box",
+          overflow: "hidden",
         }}
       >
-        <img
-          src="/brand-logo-v2.png"
-          alt="ShelfLife Logo"
+        {/* Left: Logo */}
+        <div
+          onClick={() => navigate("/")}
           style={{
-            height: "44px",
-            width: "auto",
-            objectFit: "contain",
-            filter: "drop-shadow(0 2px 12px rgba(255,255,255,0.15))",
+            display: "flex",
+            alignItems: "center",
+            cursor: "pointer",
+            flexShrink: 0,
+            transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
           }}
-        />
-      </div>
-
-      {/* Navigation Items */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "20px",
-          marginLeft: "24px",
-          flexShrink: 0,
-        }}
-      >
-        {navItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => item.action ? item.action() : navigate(item.path)}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = "scale(1.05)";
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = "scale(1)";
+          }}
+        >
+          <img
+            src="/brand-logo-v2.png"
+            alt="ShelfLife Logo"
             style={{
-              background: "none",
-              border: "none",
-              color:
-                activeNav === item.id
-                  ? "rgba(255,255,255,0.92)"
-                  : "rgba(255,255,255,0.50)",
-              fontFamily: "'Inter', sans-serif",
-              fontWeight: activeNav === item.id ? 600 : 400,
-              fontSize: "14px",
-              cursor: "pointer",
-              transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              paddingBottom: "4px",
-              position: "relative",
-              whiteSpace: "nowrap",
+              height: "38px",
+              width: "auto",
+              objectFit: "contain",
+              filter: "drop-shadow(0 2px 12px rgba(255,255,255,0.15))",
             }}
-            onMouseOver={(e) => {
-              if (activeNav !== item.id)
-                e.currentTarget.style.color = "rgba(255,255,255,0.8)";
-            }}
-            onMouseOut={(e) => {
-              if (activeNav !== item.id)
-                e.currentTarget.style.color = "rgba(255,255,255,0.50)";
-            }}
-          >
-            <span>{item.icon}</span>
-            {item.label}
-            {/* Active underline indicator */}
-            {activeNav === item.id && (
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: -2,
-                  left: 0,
-                  right: 0,
-                  height: 2,
-                  background: themeColor,
-                  borderRadius: 2,
-                  boxShadow: `0 0 10px ${themeColor}`,
-                }}
-              />
-            )}
-            {/* Premium Glowing Red Indicator for Active Room */}
-            {activeNav === "room" && item.id === "room" && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: -2,
-                  right: -8,
-                  width: 6,
-                  height: 6,
-                  background: "#FF3B30",
-                  borderRadius: "50%",
-                  boxShadow: "0 0 8px #FF3B30, 0 0 12px #FF3B30",
-                }}
-              />
-            )}
-          </button>
-        ))}
-      </div>
+          />
+        </div>
 
-      {/* Right Action Controls & Status */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          flexShrink: 0,
-          marginLeft: "auto",
-        }}
-      >
-        {hasActiveSpace && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "6px 12px",
-              borderRadius: "12px",
-              border: isPersonal
-                ? "1px solid rgba(0,214,255,0.2)"
-                : "1px solid rgba(255, 59, 48, 0.2)",
-              background: isPersonal
-                ? "rgba(0,214,255,0.08)"
-                : "rgba(255, 59, 48, 0.08)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
-              whiteSpace: "nowrap",
-            }}
-          >
-            <span
-              style={{
-                fontFamily: "'Inter', sans-serif",
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: "0.08em",
-                color: isPersonal ? "#00D6FF" : "#FF3B30",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {isPersonal ? "PERSONAL" : "ROOM"}
-            </span>
-            <span
-              style={{
-                fontFamily: "'Inter', sans-serif",
-                fontSize: 12,
-                color: "rgba(255,255,255,0.9)",
-                maxWidth: 130,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-              title={displayRoomName}
-            >
-              {displayRoomName}
-            </span>
-            {!isPersonal && (
-              <span
-                style={{
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: "rgba(255,255,255,0.65)",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                #{displayRoomId}
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Live badge */}
+        {/* Center: Navigation Items */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 6,
-            padding: "4px 8px",
-            whiteSpace: "nowrap",
-          }}
-        >
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: "50%",
-              background: themeColor,
-              boxShadow: `0 0 10px ${themeColor}`,
-              animation: "pulse 2s infinite",
-            }}
-          />
-          <span
-            style={{
-              fontFamily: "'Inter', sans-serif",
-              fontSize: 12,
-              color: "rgba(255,255,255,0.60)",
-              fontWeight: 400,
-              letterSpacing: "0.2px",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {showRoomOnlineCount ? roomOnlineLabel : "System Online"}
-          </span>
-        </div>
-
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: "7px 16px",
-            borderRadius: "12px",
-            border: "1px solid rgba(255,255,255,0.12)",
-            background: "rgba(255,255,255,0.05)",
-            color: "rgba(255,255,255,0.92)",
-            fontFamily: "'Inter', sans-serif",
-            fontWeight: 500,
-            fontSize: "13px",
-            cursor: "pointer",
-            transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)",
-            whiteSpace: "nowrap",
+            gap: "12px",
+            marginLeft: "16px",
             flexShrink: 0,
           }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.background = "rgba(255,255,255,0.12)";
-            e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)";
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-            e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
+        >
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              className="nav-link-btn"
+              onClick={() => item.action ? item.action() : navigate(item.path)}
+              style={{
+                background: "none",
+                border: "none",
+                color:
+                  activeNav === item.id
+                    ? "rgba(255,255,255,0.95)"
+                    : "rgba(255,255,255,0.55)",
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: activeNav === item.id ? 600 : 400,
+                fontSize: "13px",
+                cursor: "pointer",
+                transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                display: "flex",
+                alignItems: "center",
+                gap: "5px",
+                position: "relative",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
+              onMouseOver={(e) => {
+                if (activeNav !== item.id)
+                  e.currentTarget.style.color = "rgba(255,255,255,0.85)";
+              }}
+              onMouseOut={(e) => {
+                if (activeNav !== item.id)
+                  e.currentTarget.style.color = "rgba(255,255,255,0.55)";
+              }}
+            >
+              <span style={{ fontSize: "14px" }}>{item.icon}</span>
+              <span className="nav-link-text">{item.label}</span>
+
+              {/* Active underline indicator */}
+              {activeNav === item.id && (
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: -4,
+                    left: 0,
+                    right: 0,
+                    height: 2,
+                    background: themeColor,
+                    borderRadius: 2,
+                    boxShadow: `0 0 10px ${themeColor}`,
+                  }}
+                />
+              )}
+              {/* Premium Glowing Red Indicator for Active Room */}
+              {activeNav === "room" && item.id === "room" && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: -2,
+                    right: -6,
+                    width: 6,
+                    height: 6,
+                    background: "#FF3B30",
+                    borderRadius: "50%",
+                    boxShadow: "0 0 8px #FF3B30, 0 0 12px #FF3B30",
+                  }}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Right: Space Info, Status Badge & Logout Button */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            flexShrink: 0,
+            marginLeft: "auto",
           }}
         >
-          Logout
-        </button>
-      </div>
-    </nav>
-    <ExtensionModal isOpen={isExtensionModalOpen} onClose={() => setIsExtensionModalOpen(false)} />
+          {hasActiveSpace && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "5px 10px",
+                borderRadius: "10px",
+                border: isPersonal
+                  ? "1px solid rgba(0,214,255,0.25)"
+                  : "1px solid rgba(255, 59, 48, 0.25)",
+                background: isPersonal
+                  ? "rgba(0,214,255,0.08)"
+                  : "rgba(255, 59, 48, 0.08)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  color: isPersonal ? "#00D6FF" : "#FF3B30",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {isPersonal ? "PERSONAL" : "ROOM"}
+              </span>
+              <span
+                style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: 12,
+                  color: "rgba(255,255,255,0.9)",
+                  maxWidth: 110,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+                title={displayRoomName}
+              >
+                {displayRoomName}
+              </span>
+              {!isPersonal && (
+                <span
+                  style={{
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: 10,
+                    fontWeight: 600,
+                    color: "rgba(255,255,255,0.65)",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  #{displayRoomId}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Live System Status badge */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              padding: "4px 6px",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}
+          >
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: themeColor,
+                boxShadow: `0 0 10px ${themeColor}`,
+                animation: "pulse 2s infinite",
+              }}
+            />
+            <span
+              className="nav-status-label"
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 12,
+                color: "rgba(255,255,255,0.60)",
+                fontWeight: 400,
+                letterSpacing: "0.2px",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {showRoomOnlineCount ? roomOnlineLabel : "System Online"}
+            </span>
+          </div>
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            style={{
+              padding: "6px 14px",
+              borderRadius: "10px",
+              border: "1px solid rgba(255,255,255,0.15)",
+              background: "rgba(255,255,255,0.08)",
+              color: "rgba(255,255,255,0.95)",
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 600,
+              fontSize: "12px",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.background = "rgba(255,255,255,0.16)";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
+            }}
+          >
+            Logout
+          </button>
+        </div>
+      </nav>
+      <ExtensionModal isOpen={isExtensionModalOpen} onClose={() => setIsExtensionModalOpen(false)} />
     </>
   );
 }
