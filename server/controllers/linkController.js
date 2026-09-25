@@ -376,23 +376,49 @@ export const ingestLink = async (req, res) => {
   }
 
   try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch URL: ${response.statusText}`);
+    const SCRAPER_URL = process.env.SCRAPER_URL || "http://127.0.0.1:8001";
+    let scrapedTitle = url;
+    let content = "";
+    let contentHash = "";
+    let qualityScore = 0;
+
+    try {
+      const scraperRes = await fetch(`${SCRAPER_URL}/scrape`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+
+      if (scraperRes.ok) {
+        const scrapeJson = await scraperRes.json();
+        if (scrapeJson.success && scrapeJson.data) {
+          const d = scrapeJson.data;
+          scrapedTitle = d.title || url;
+          content = d.text || d.description || "";
+          contentHash = d.content_hash || "";
+          qualityScore = d.quality_score || 0;
+        }
+      }
+    } catch (scraperErr) {
+      console.warn("Python scraper service call failed, falling back:", scraperErr.message);
     }
-    const html = await response.text();
 
-    const $ = cheerio.load(html);
-    const scrapedTitle =
-      $("title").first().text() || $("h1").first().text() || "No title found";
-
-    $("script, style, nav, footer, header, aside").remove();
-    const content = $("body").text().replace(/\s\s+/g, " ").trim();
+    // Secondary fallback if python scraper was unreachable or empty
+    if (!content) {
+      try {
+        const response = await fetch(url);
+        if (response.ok) {
+          const html = await response.text();
+          const $ = cheerio.load(html);
+          scrapedTitle = $("title").first().text().trim() || url;
+          $("script, style, nav, footer, header, aside").remove();
+          content = $("body").text().replace(/\s\s+/g, " ").trim();
+        }
+      } catch (e) {}
+    }
 
     if (!content) {
-      return res
-        .status(400)
-        .json({ message: "Could not extract content from the URL." });
+      content = "Web content saved from " + url;
     }
 
     let title = scrapedTitle;

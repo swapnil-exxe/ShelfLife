@@ -10,6 +10,7 @@ import userRoutes from "./routes/userRoutes.js";
 import linkRoutes from "./routes/linkRoutes.js";
 import roomRoutes from "./routes/roomRoutes.js"; // ← NEW
 import projectRoutes from "./routes/projectRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import { runContextFeedSweep } from "./services/contextFeedService.js";
 import {
   generalLimiter,
@@ -46,11 +47,21 @@ app.use("/api/users", userRoutes);
 app.use("/api/links", linkRoutes);
 app.use("/api/rooms", roomRoutes); // ← NEW
 app.use("/api/projects", projectRoutes);
+app.use("/api/admin", adminRoutes);
+
+const primaryUri = process.env.MONGO_URI;
+const fallbackUri = "mongodb://127.0.0.1:27017/shelflife_db";
 
 mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("🔥 MongoDB Connected!"))
-  .catch((err) => console.log("Database Error:", err));
+  .connect(primaryUri)
+  .then(() => console.log("🔥 MongoDB Connected to Atlas!"))
+  .catch((err) => {
+    console.log("Primary Atlas connection error, attempting fallback to local MongoDB...");
+    mongoose
+      .connect(fallbackUri)
+      .then(() => console.log("🔥 Connected to Local MongoDB!"))
+      .catch((fallbackErr) => console.log("Fallback Database Error:", fallbackErr));
+  });
 
 app.get("/api/health", (req, res) => {
   res.json({ message: "SHELFLIFE Server is alive!" });

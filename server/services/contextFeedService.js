@@ -146,6 +146,47 @@ export const refreshContextFeedForLink = async (link) => {
   }
 
   try {
+    const SCRAPER_URL = process.env.SCRAPER_URL || "http://127.0.0.1:8001";
+    let freshContent = "";
+    let freshHash = "";
+
+    try {
+      const scraperRes = await fetch(`${SCRAPER_URL}/scrape`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: link.originalUrl }),
+      });
+      if (scraperRes.ok) {
+        const scrapeJson = await scraperRes.json();
+        if (scrapeJson.success && scrapeJson.data) {
+          freshContent = scrapeJson.data.text || "";
+          freshHash = scrapeJson.data.content_hash || "";
+        }
+      }
+    } catch (e) {}
+
+    // Deterministic SHA256 Check: If content hash is unchanged, skip AI call
+    if (freshHash && link.contentHash && freshHash === link.contentHash) {
+      const nextCheckAt = scheduleNextCheckFrom(now);
+      await Link.findByIdAndUpdate(
+        link._id,
+        {
+          contextFeed: {
+            status: "up-to-date",
+            summary: "Content verified unchanged via SHA256 hash match.",
+            successorUrl: "",
+            confidence: 1.0,
+            sources: [link.originalUrl],
+            checkedAt: now,
+            provider: "sha256_hash",
+          },
+          contextFeedLastCheckedAt: now,
+          contextFeedNextCheckAt: nextCheckAt,
+        },
+        { timestamps: false }
+      );
+      return;
+    }
     const completion = await getGroqClient().chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: [

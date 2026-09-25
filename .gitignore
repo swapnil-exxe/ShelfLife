@@ -6,3 +6,6 @@ server/.env
 dist/
 build/
 .env
+scraper/snapshots/
+__pycache__/
+*.pyc
