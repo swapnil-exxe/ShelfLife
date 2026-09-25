@@ -274,6 +274,25 @@ const Login = () => {
     }
   };
 
+  const handleQuickLogin = async (quickEmail, quickPassword) => {
+    setError("");
+    setFormData({ email: quickEmail, password: quickPassword });
+    try {
+      const res = await axios.post("/api/users/login", {
+        email: quickEmail,
+        password: quickPassword,
+      });
+      localStorage.setItem("token", res.data.token);
+      localStorage.removeItem("shelfRoomId");
+      localStorage.removeItem("shelfRoomName");
+      navigate("/");
+    } catch (err) {
+      let errMsg = "Quick login failed.";
+      if (err.response?.data?.message) errMsg = err.response.data.message;
+      setError(errMsg);
+    }
+  };
+
   return (
     <>
       <style>{`
@@ -330,6 +349,37 @@ const Login = () => {
           box-shadow: 0 8px 20px rgba(29, 158, 117, 0.4);
         }
 
+        /* Demo Login Buttons */
+        .quick-btn {
+          flex: 1;
+          padding: 10px 12px;
+          border-radius: 10px;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          background: rgba(255, 255, 255, 0.05);
+          color: #fff;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+        }
+        .quick-btn-student:hover {
+          background: rgba(56, 189, 248, 0.15);
+          border-color: #38bdf8;
+          color: #38bdf8;
+          box-shadow: 0 4px 14px rgba(56, 189, 248, 0.2);
+        }
+        .quick-btn-admin:hover {
+          background: rgba(192, 132, 252, 0.15);
+          border-color: #c084fc;
+          color: #c084fc;
+          box-shadow: 0 4px 14px rgba(192, 132, 252, 0.2);
+        }
+
         /* Animations */
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(20px); }
@@ -376,7 +426,7 @@ const Login = () => {
           }}
         >
           {/* Header */}
-          <div style={{ textAlign: "center", marginBottom: "32px" }}>
+          <div style={{ textAlign: "center", marginBottom: "28px" }}>
             <img
               src="/brand-logo-v2.png"
               alt="ShelfLife Logo"
@@ -409,6 +459,35 @@ const Login = () => {
             >
               Access your ShelfLife account
             </p>
+          </div>
+
+          {/* 1-CLICK DEMO LOGIN BUTTONS */}
+          <div style={{ marginBottom: "20px" }}>
+            <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255,255,255,0.4)", textAlign: "center", marginBottom: "10px" }}>
+              ⚡ 1-Click Demo Login
+            </div>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                type="button"
+                onClick={() => handleQuickLogin("student@gmail.com", "studentpassword")}
+                className="quick-btn quick-btn-student"
+              >
+                🎓 Student
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickLogin("admin@gmail.com", "adminpassword")}
+                className="quick-btn quick-btn-admin"
+              >
+                🛡️ Admin
+              </button>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
+            <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.1)" }} />
+            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>or enter credentials</span>
+            <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.1)" }} />
           </div>
 
           {error && (
