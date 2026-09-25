@@ -126,16 +126,16 @@ export default function Navbar({ roomOnlineCount = null }) {
           justifyContent: "space-between",
           background: scrolled
             ? "rgba(10, 14, 23, 0.85)"
-            : "rgba(7, 9, 14, 0.75)",
-          backdropFilter: "blur(24px) saturate(160%)",
-          WebkitBackdropFilter: "blur(24px) saturate(160%)",
+            : "transparent",
+          backdropFilter: scrolled ? "blur(24px) saturate(160%)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(24px) saturate(160%)" : "none",
           borderRadius: scrolled ? "24px" : "0px",
           border: scrolled
             ? "1px solid rgba(255, 255, 255, 0.08)"
-            : "1px solid transparent",
-          borderBottom: !scrolled
-            ? "1px solid rgba(255,255,255,0.06)"
-            : "1px solid rgba(255, 255, 255, 0.08)",
+            : "none",
+          borderBottom: scrolled
+            ? "1px solid rgba(255, 255, 255, 0.08)"
+            : "none",
           boxShadow: scrolled
             ? "0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)"
             : "none",
