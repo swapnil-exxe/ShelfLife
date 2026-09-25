@@ -2,9 +2,28 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function ExtensionModal({ isOpen, onClose }) {
-  const [btnText, setBtnText] = useState("Add to Chrome");
+  const [downloaded, setDownloaded] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   if (!isOpen) return null;
+
+  const handleDownloadAndInstall = () => {
+    // 1. Trigger zip download
+    const link = document.createElement("a");
+    link.href = "/shelflife-extension.zip";
+    link.download = "shelflife-extension.zip";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setDownloaded(true);
+  };
+
+  const handleCopyChromeUrl = () => {
+    navigator.clipboard.writeText("chrome://extensions");
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 3000);
+  };
 
   return (
     <AnimatePresence>
@@ -22,7 +41,7 @@ export default function ExtensionModal({ isOpen, onClose }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "rgba(0, 0, 0, 0.5)",
+          background: "rgba(0, 0, 0, 0.65)",
           backdropFilter: "blur(12px)",
           padding: "20px",
         }}
@@ -36,19 +55,19 @@ export default function ExtensionModal({ isOpen, onClose }) {
           style={{
             position: "relative",
             width: "100%",
-            maxWidth: "500px",
-            background: "linear-gradient(155deg, rgba(20,25,35,0.7), rgba(10,12,20,0.85))",
+            maxWidth: "520px",
+            background: "linear-gradient(155deg, rgba(20,25,35,0.9), rgba(10,12,20,0.95))",
             backdropFilter: "blur(40px) saturate(200%)",
             WebkitBackdropFilter: "blur(40px) saturate(200%)",
             borderRadius: "32px",
-            padding: "40px",
-            boxShadow: "0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px rgba(0, 214, 255, 0.3)",
+            padding: "36px",
+            boxShadow: "0 30px 60px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1), 0 0 0 1px rgba(0, 214, 255, 0.3)",
             color: "white",
             overflow: "hidden",
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Glowing orb background effect */}
+          {/* Glowing orb effects */}
           <div
             style={{
               position: "absolute",
@@ -56,7 +75,7 @@ export default function ExtensionModal({ isOpen, onClose }) {
               right: "-50px",
               width: "200px",
               height: "200px",
-              background: "radial-gradient(circle, rgba(124, 58, 237, 0.3) 0%, transparent 70%)",
+              background: "radial-gradient(circle, rgba(124, 58, 237, 0.35) 0%, transparent 70%)",
               filter: "blur(40px)",
               pointerEvents: "none",
             }}
@@ -68,7 +87,7 @@ export default function ExtensionModal({ isOpen, onClose }) {
               left: "-50px",
               width: "200px",
               height: "200px",
-              background: "radial-gradient(circle, rgba(0, 214, 255, 0.2) 0%, transparent 70%)",
+              background: "radial-gradient(circle, rgba(0, 214, 255, 0.25) 0%, transparent 70%)",
               filter: "blur(40px)",
               pointerEvents: "none",
             }}
@@ -98,129 +117,108 @@ export default function ExtensionModal({ isOpen, onClose }) {
             ✕
           </button>
 
-          <h2 style={{
-            fontFamily: "'Inter', sans-serif",
-            fontSize: "28px",
-            fontWeight: 800,
-            letterSpacing: "-0.5px",
-            margin: "0 0 12px 0",
-            background: "linear-gradient(to right, #ffffff, #a5b4fc)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}>
-            ShelfLife Extension
-          </h2>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
+            <span style={{ fontSize: "28px" }}>🧩</span>
+            <h2 style={{
+              fontFamily: "'Inter', sans-serif",
+              fontSize: "26px",
+              fontWeight: 800,
+              letterSpacing: "-0.5px",
+              margin: 0,
+              background: "linear-gradient(to right, #ffffff, #00D6FF)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}>
+              Add ShelfLife to Chrome
+            </h2>
+          </div>
+
           <p style={{
             fontFamily: "'Inter', sans-serif",
-            fontSize: "15px",
-            color: "rgba(255,255,255,0.6)",
+            fontSize: "14px",
+            color: "rgba(255,255,255,0.65)",
             lineHeight: 1.5,
-            margin: "0 0 32px 0",
+            margin: "0 0 24px 0",
           }}>
-            Save any website instantly to your ShelfLife dashboard with our Chrome extension.
+            Tap below to automatically download the Chrome extension package and load it into your browser.
           </p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "32px" }}>
+          {/* Step Guide */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "24px" }}>
             {[
-              { num: 1, text: "Add to Chrome (Load unpacked /extension folder)" },
-              { num: 2, text: "Pin the extension to your toolbar" },
-              { num: 3, text: "Browse to any website" },
-              { num: 4, text: "Click the ShelfLife icon to save" },
-              { num: 5, text: "Website automatically appears here!" }
-            ].map((step) => (
-              <div key={step.num} style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                <div style={{
-                  width: "28px",
-                  height: "28px",
-                  borderRadius: "50%",
-                  background: "rgba(0,214,255,0.15)",
-                  border: "1px solid rgba(0,214,255,0.3)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: "13px",
-                  fontWeight: 700,
-                  color: "#00D6FF"
-                }}>
-                  {step.num}
+              { num: "1️⃣", title: "Tap 'Add to Chrome'", sub: "Automatically downloads shelflife-extension.zip" },
+              { num: "2️⃣", title: "Unzip the Package", sub: "Extract the downloaded folder" },
+              { num: "3️⃣", title: "Open chrome://extensions", sub: "Enable 'Developer mode' toggle (top right)" },
+              { num: "4️⃣", title: "Click 'Load unpacked'", sub: "Select the unzipped extension folder" },
+            ].map((step, idx) => (
+              <div key={idx} style={{ display: "flex", alignItems: "center", gap: "14px", background: "rgba(255,255,255,0.03)", padding: "10px 14px", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                <span style={{ fontSize: "20px" }}>{step.num}</span>
+                <div>
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: "14px", fontWeight: 600, color: "#fff" }}>{step.title}</div>
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>{step.sub}</div>
                 </div>
-                <span style={{
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: "15px",
-                  color: "rgba(255,255,255,0.85)"
-                }}>
-                  {step.text}
-                </span>
               </div>
             ))}
           </div>
 
-          <div style={{
-            background: "rgba(255,255,255,0.03)",
-            border: "1px dashed rgba(255,255,255,0.2)",
-            borderRadius: "16px",
-            padding: "16px",
-            marginBottom: "32px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "12px",
-            color: "rgba(255,255,255,0.6)",
-            fontFamily: "'Inter', sans-serif",
-            fontSize: "14px",
-          }}>
-            <span>📌</span> Pin ShelfLife for one-click saves
-          </div>
+          {downloaded && (
+            <div style={{ background: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.4)", color: "#34d399", padding: "12px 16px", borderRadius: "14px", marginBottom: "20px", fontSize: "13px", fontWeight: 600, textAlign: "center" }}>
+              ✓ Extension package downloaded! Open <strong>chrome://extensions</strong> and click <strong>Load unpacked</strong>.
+            </div>
+          )}
 
-          <div style={{ display: "flex", gap: "12px" }}>
+          {/* Action Buttons */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             <button
-              onClick={() => {
-                setBtnText("See step 1 above! 👆");
-                setTimeout(() => setBtnText("Add to Chrome"), 3000);
-              }}
+              onClick={handleDownloadAndInstall}
               style={{
-                flex: 1,
-                padding: "14px 24px",
+                width: "100%",
+                padding: "16px 24px",
                 borderRadius: "16px",
                 border: "none",
                 background: "linear-gradient(135deg, #00D6FF, #0077ff)",
                 color: "white",
                 fontFamily: "'Inter', sans-serif",
-                fontWeight: 600,
-                fontSize: "15px",
+                fontWeight: 700,
+                fontSize: "16px",
                 cursor: "pointer",
-                boxShadow: "0 8px 20px rgba(0,214,255,0.3)",
-                transition: "transform 0.2s, box-shadow 0.2s",
+                boxShadow: "0 8px 24px rgba(0,214,255,0.35)",
+                transition: "all 0.2s ease",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow = "0 12px 24px rgba(0,214,255,0.4)";
+                e.currentTarget.style.boxShadow = "0 12px 28px rgba(0,214,255,0.45)";
               }}
               onMouseOut={(e) => {
                 e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,214,255,0.3)";
+                e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,214,255,0.35)";
               }}
             >
-              {btnText}
+              <span>⚡</span>
+              <span>{downloaded ? "Re-download Extension Package (.zip)" : "Tap to Add to Chrome Automatically"}</span>
             </button>
+
             <button
+              onClick={handleCopyChromeUrl}
               style={{
-                padding: "14px 24px",
-                borderRadius: "16px",
-                border: "1px solid rgba(255,255,255,0.1)",
+                width: "100%",
+                padding: "12px 20px",
+                borderRadius: "14px",
+                border: "1px solid rgba(255,255,255,0.12)",
                 background: "rgba(255,255,255,0.05)",
-                color: "white",
+                color: copiedLink ? "#38bdf8" : "rgba(255,255,255,0.8)",
                 fontFamily: "'Inter', sans-serif",
                 fontWeight: 600,
-                fontSize: "15px",
+                fontSize: "13px",
                 cursor: "pointer",
-                transition: "background 0.2s",
+                transition: "all 0.2s ease",
               }}
-              onMouseOver={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
-              onMouseOut={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.05)"}
             >
-              Learn More
+              {copiedLink ? "✓ Copied 'chrome://extensions' link!" : "📋 Copy 'chrome://extensions' path to clipboard"}
             </button>
           </div>
         </motion.div>
