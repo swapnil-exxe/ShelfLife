@@ -435,15 +435,19 @@ const Login = () => {
           )}
 
           {/* Form */}
-          <form onSubmit={onSubmit}>
+          <form onSubmit={onSubmit} autoComplete="off">
             <div>
               <input
                 className="glass-input"
                 type="email"
                 placeholder="Email Address"
-                name="email"
+                name="user_email_no_fill"
+                autoComplete="off"
                 value={email}
-                onChange={onChange}
+                onChange={(e) => {
+                  setError("");
+                  setFormData({ ...formData, email: e.target.value });
+                }}
                 required
               />
             </div>
@@ -452,9 +456,13 @@ const Login = () => {
                 className="glass-input"
                 type="password"
                 placeholder="Password"
-                name="password"
+                name="user_password_no_fill"
+                autoComplete="new-password"
                 value={password}
-                onChange={onChange}
+                onChange={(e) => {
+                  setError("");
+                  setFormData({ ...formData, password: e.target.value });
+                }}
                 minLength="6"
                 required
               />

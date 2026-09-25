@@ -563,6 +563,7 @@ export default function RoomGate() {
                 {tab === "join" && (
                   <motion.form
                     key="join"
+                    autoComplete="off"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
@@ -590,6 +591,8 @@ export default function RoomGate() {
                         Room ID
                       </label>
                       <input
+                        name="shelflife_room_id_entry"
+                        autoComplete="off"
                         style={{
                           ...inputStyle,
                           fontFamily: "'Inter', sans-serif",
@@ -625,6 +628,8 @@ export default function RoomGate() {
                         Password
                       </label>
                       <input
+                        name="shelflife_room_pass_entry"
+                        autoComplete="new-password"
                         style={inputStyle}
                         type="password"
                         placeholder="Enter room password"
@@ -678,6 +683,7 @@ export default function RoomGate() {
                 {tab === "create" && (
                   <motion.form
                     key="create"
+                    autoComplete="off"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
@@ -705,6 +711,8 @@ export default function RoomGate() {
                         Shelf Name (optional)
                       </label>
                       <input
+                        name="shelflife_create_name_entry"
+                        autoComplete="off"
                         style={inputStyle}
                         placeholder="e.g. Project Apollo"
                         value={createName}
@@ -727,6 +735,8 @@ export default function RoomGate() {
                         Room Password
                       </label>
                       <input
+                        name="shelflife_create_pass_entry"
+                        autoComplete="new-password"
                         style={inputStyle}
                         type="password"
                         placeholder="Choose a team password"
@@ -802,6 +812,7 @@ export default function RoomGate() {
                 {tab === "remix" && (
                   <motion.form
                     key="remix"
+                    autoComplete="off"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
@@ -921,6 +932,8 @@ export default function RoomGate() {
                         New Shelf Name (optional)
                       </label>
                       <input
+                        name="shelflife_fork_name_entry"
+                        autoComplete="off"
                         style={inputStyle}
                         placeholder="e.g. Middle East Briefing Remix"
                         value={forkName}
@@ -944,6 +957,8 @@ export default function RoomGate() {
                         New Shelf Password
                       </label>
                       <input
+                        name="shelflife_fork_pass_entry"
+                        autoComplete="new-password"
                         style={inputStyle}
                         type="password"
                         placeholder="Choose password for your fork"
