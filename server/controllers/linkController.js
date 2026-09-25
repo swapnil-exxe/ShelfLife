@@ -6,6 +6,7 @@ import Project from "../models/Project.js";
 import Room from "../models/Room.js";
 import User from "../models/User.js";
 import { initializeContextFeedForNewLink } from "../services/contextFeedService.js";
+import { logUserActivity } from "../services/activityLogger.js";
 
 let groq = null;
 const getGroqClient = () => {
@@ -463,6 +464,8 @@ export const ingestLink = async (req, res) => {
     await newLink.save();
     await updateUserProfileTag(userId);
 
+    logUserActivity(userId, "LINK_CREATED", "LINK", "Link", newLink._id, { title: newLink.title, url: newLink.originalUrl, vibe: newLink.vibe, roomId: storageRoomId }, req);
+
     const io = req.app.locals.io;
     if (io) {
       if (requestedRoomId) {
@@ -617,6 +620,8 @@ export const deleteLink = async (req, res) => {
       return res.status(404).json({ message: "Link not found" });
     }
 
+    logUserActivity(req.user.id, "LINK_DELETED", "LINK", "Link", deletedLink._id, { title: deletedLink.title }, req);
+
     res.json({ message: "Link deleted successfully", id: deletedLink._id });
   } catch (error) {
     console.error("Error deleting link:", error);
@@ -648,6 +653,8 @@ export const archiveLink = async (req, res) => {
       { new: true },
     );
 
+    logUserActivity(req.user.id, "LINK_ARCHIVED", "LINK", "Link", link._id, { title: link.title }, req);
+
     res.json(link);
   } catch (error) {
     console.error("Error archiving link:", error);
@@ -678,6 +685,8 @@ export const restoreLink = async (req, res) => {
       { isArchived: false, decay: 0, updatedAt: new Date() },
       { new: true },
     );
+
+    logUserActivity(req.user.id, "LINK_RESTORED", "LINK", "Link", link._id, { title: link.title }, req);
 
     res.json(link);
   } catch (error) {

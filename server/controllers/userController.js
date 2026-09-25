@@ -2,6 +2,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import Link from "../models/Link.js";
+import UserSession from "../models/UserSession.js";
+import { logUserActivity, createUserSession } from "../services/activityLogger.js";
 
 // @desc    Register a new user
 // @route   POST /api/users/register
@@ -14,6 +16,7 @@ export const registerUser = async (req, res) => {
     // Check if user already exists
     let user = await User.findOne({ email: normalizedEmail });
     if (user) {
+      logUserActivity(null, "LOGIN_FAILED", "AUTH", "User", null, { email: normalizedEmail, reason: "Already registered" }, req);
       return res.status(400).json({ message: "User already exists" });
     }
 
@@ -31,6 +34,10 @@ export const registerUser = async (req, res) => {
     // Save user to database
     await user.save();
 
+    logUserActivity(user._id, "ACCOUNT_CREATED", "USER", "User", user._id, { username: user.username, email: user.email }, req);
+    logUserActivity(user._id, "LOGIN_SUCCESS", "AUTH", "User", user._id, { username: user.username }, req);
+    const session = await createUserSession(user._id, req);
+
     // Create JWT payload
     const payload = {
       user: {
@@ -39,13 +46,14 @@ export const registerUser = async (req, res) => {
         email: user.email,
         role: user.role || "user",
       },
+      sessionId: session?.sessionId || null,
     };
 
     // Sign token
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
-      { expiresIn: "5h" }, // Token expires in 5 hours
+      { expiresIn: "5h" },
       (err, token) => {
         if (err) throw err;
         res.json({ token, user: { id: user.id, username: user.username, email: user.email, role: user.role || "user" } });
@@ -68,14 +76,24 @@ export const loginUser = async (req, res) => {
     // Check if user exists
     let user = await User.findOne({ email: normalizedEmail });
     if (!user) {
+      logUserActivity(null, "LOGIN_FAILED", "AUTH", "User", null, { email: normalizedEmail, reason: "Email not registered" }, req);
       return res.status(400).json({ message: "Email is not registered. Please sign up first." });
+    }
+
+    if (user.isActive === false) {
+      logUserActivity(user._id, "LOGIN_FAILED", "AUTH", "User", user._id, { email: normalizedEmail, reason: "Account disabled" }, req);
+      return res.status(403).json({ message: "Your account has been disabled. Contact admin." });
     }
 
     // Compare entered password with hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      logUserActivity(user._id, "LOGIN_FAILED", "AUTH", "User", user._id, { email: normalizedEmail, reason: "Incorrect password" }, req);
       return res.status(400).json({ message: "Incorrect password." });
     }
+
+    logUserActivity(user._id, "LOGIN_SUCCESS", "AUTH", "User", user._id, { username: user.username }, req);
+    const session = await createUserSession(user._id, req);
 
     // Create JWT payload
     const payload = {
@@ -85,6 +103,7 @@ export const loginUser = async (req, res) => {
         email: user.email,
         role: user.role || "user",
       },
+      sessionId: session?.sessionId || null,
     };
 
     // Sign token

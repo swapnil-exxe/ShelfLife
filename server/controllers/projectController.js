@@ -1,6 +1,7 @@
 import Project from "../models/Project.js";
 import Room from "../models/Room.js";
 import Link from "../models/Link.js";
+import { logUserActivity } from "../services/activityLogger.js";
 
 function normalizeScope(roomId, scope) {
   const normalizedRoomId = roomId ? roomId.toUpperCase().trim() : null;
@@ -60,6 +61,8 @@ export const createProject = async (req, res) => {
       title: title.trim(),
       description: description.trim(),
     });
+
+    logUserActivity(userId, "PROJECT_CREATED", "PROJECT", "Project", project._id, { title: project.title, roomId: storageRoomId }, req);
 
     return res.status(201).json(project);
   } catch (error) {

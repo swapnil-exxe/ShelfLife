@@ -2,6 +2,7 @@ import crypto from "crypto";
 import Room from "../models/Room.js";
 import Link from "../models/Link.js";
 import { initializeContextFeedForNewLink } from "../services/contextFeedService.js";
+import { logUserActivity } from "../services/activityLogger.js";
 
 // ── Helper: generate a readable 6-char room ID ────────────────────────────────
 function generateRoomId() {
@@ -42,6 +43,8 @@ export const createRoom = async (req, res) => {
 
     await room.save();
 
+    logUserActivity(userId, "ROOM_CREATED", "ROOM", "Room", room._id, { roomId: room.roomId, name: room.name, isPublic: room.isPublic }, req);
+
     res.status(201).json({
       roomId: room.roomId,
       name: room.name,
@@ -78,6 +81,7 @@ export const joinRoom = async (req, res) => {
 
     const isMatch = await room.matchPassword(password);
     if (!isMatch) {
+      logUserActivity(userId, "ROOM_JOIN_FAILED", "SECURITY", "Room", room._id, { roomId: room.roomId, reason: "Incorrect room password" }, req);
       return res.status(401).json({ message: "Incorrect password." });
     }
 
@@ -86,6 +90,8 @@ export const joinRoom = async (req, res) => {
       room.members.push(userId);
       await room.save();
     }
+
+    logUserActivity(userId, "ROOM_JOINED", "ROOM", "Room", room._id, { roomId: room.roomId }, req);
 
     res.json({
       roomId: room.roomId,
@@ -123,6 +129,8 @@ export const setRoomVisibility = async (req, res) => {
 
     room.isPublic = isPublic;
     await room.save();
+
+    logUserActivity(req.user._id, "ROOM_VISIBILITY_CHANGED", "ROOM", "Room", room._id, { roomId: room.roomId, isPublic: room.isPublic }, req);
 
     return res.json({
       roomId: room.roomId,
