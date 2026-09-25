@@ -1,0 +1,11 @@
+{
+  "url": "https://en.wikipedia.org/wiki/Superhero_comics",
+  "final_url": "https://en.wikipedia.org/wiki/Superhero_comics",
+  "timestamp": "2026-09-25T07:38:45.068111",
+  "status_code": 200,
+  "content_hash": "6203e04266717027c0583ffb57c3031d473ac7f244e4737698621de5698cf022",
+  "title": "Superhero comics - Wikipedia",
+  "text_length": 5719,
+  "fetch_method": "fast_http",
+  "quality_score": 80
+}

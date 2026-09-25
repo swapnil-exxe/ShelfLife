@@ -1,0 +1,11 @@
+{
+  "url": "https://en.wikipedia.org/wiki/Great_Depression",
+  "final_url": "https://en.wikipedia.org/wiki/Great_Depression",
+  "timestamp": "2026-09-25T07:38:46.102916",
+  "status_code": 200,
+  "content_hash": "e11d67eb03d812bf0d04d4b165c2d801290a816661afcfc507a7143c40b013d0",
+  "title": "Great Depression - Wikipedia",
+  "text_length": 137955,
+  "fetch_method": "fast_http",
+  "quality_score": 80
+}

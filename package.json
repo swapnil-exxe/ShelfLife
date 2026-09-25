@@ -2,8 +2,19 @@
   "name": "shelflife",
   "version": "1.0.0",
   "type": "module",
+  "private": true,
   "scripts": {
-    "audit:health": "node scripts/audit_repo_health.js"
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run dev:scraper\"",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:scraper": "PYTHONPATH=backend python3 backend/scraper/app.py",
+    "start:frontend": "npm --prefix frontend run dev",
+    "start:backend": "npm --prefix backend run start",
+    "start:scraper": "PYTHONPATH=backend python3 backend/scraper/app.py",
+    "audit:health": "node backend/scripts/audit_repo_health.js"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   },
   "dependencies": {
     "date-fns": "^4.1.0",

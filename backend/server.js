@@ -11,6 +11,8 @@ import linkRoutes from "./routes/linkRoutes.js";
 import roomRoutes from "./routes/roomRoutes.js"; // ← NEW
 import projectRoutes from "./routes/projectRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import csvRoutes from "./routes/csvRoutes.js";
+import diagnosticsRoutes from "./routes/diagnostics.js";
 import { runContextFeedSweep } from "./services/contextFeedService.js";
 import {
   generalLimiter,
@@ -48,6 +50,8 @@ app.use("/api/links", linkRoutes);
 app.use("/api/rooms", roomRoutes); // ← NEW
 app.use("/api/projects", projectRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/admin/activity", csvRoutes);
+app.use("/api/health/diagnostics", diagnosticsRoutes);
 
 const primaryUri = process.env.MONGO_URI;
 const fallbackUri = "mongodb://127.0.0.1:27017/shelflife_db";

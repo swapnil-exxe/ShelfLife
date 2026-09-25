@@ -1,0 +1,11 @@
+{
+  "url": "https://github.com/settings/profile",
+  "final_url": "https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2Fsettings%2Fprofile",
+  "timestamp": "2026-09-25T07:14:23.367052",
+  "status_code": 200,
+  "content_hash": "c7d962b7fda9eb1b8c75c060eb69ea3b16986c15c4efae5dedce91dac83fa4c9",
+  "title": "Sign in to GitHub \u00b7 GitHub",
+  "text_length": 117,
+  "fetch_method": "fast_http",
+  "quality_score": 70
+}

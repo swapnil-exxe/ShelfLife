@@ -1,0 +1,11 @@
+{
+  "url": "https://en.wikipedia.org/wiki/Iron",
+  "final_url": "https://en.wikipedia.org/wiki/Iron",
+  "timestamp": "2026-09-25T07:14:58.259537",
+  "status_code": 200,
+  "content_hash": "d7f4cf16efacf2257f296fa2503391876bb30c8cbfdf696d2c02acfda72b603f",
+  "title": "Iron - Wikipedia",
+  "text_length": 108341,
+  "fetch_method": "fast_http",
+  "quality_score": 80
+}
