@@ -115,7 +115,6 @@ Use these 1-click credentials directly from the `/login` screen:
 
 ---
 
-## 📜 Repository License & Credits
+## 📜 License
 
-Built for the **SHELFLIFE** Hackathon & Monorepo Modernization Project.  
-Copyright &copy; 2026 SHELFLIFE Team. All rights reserved.
+Copyright &copy; 2026 SHELFLIFE Personal Project. All rights reserved.
