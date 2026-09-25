@@ -6,7 +6,7 @@ import RoomGate from "./pages/RoomGate"; // ← NEW
 import Graveyard from "./pages/Graveyard";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
-import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 import "./App.css";
 
 function App() {
@@ -22,6 +22,10 @@ function App() {
         <Route path="/room" element={<RoomGate />} /> {/* ← NEW */}
         <Route path="/graveyard" element={<Graveyard />} />
         <Route path="/profile" element={<Profile />} />
+      </Route>
+
+      {/* Admin Protected Routes */}
+      <Route path="/admin" element={<AdminRoute />}>
         <Route path="/admin" element={<AdminDashboard />} />
       </Route>
     </Routes>

@@ -21,15 +21,38 @@ export default function Navbar({ roomOnlineCount = null }) {
       ? "1 person in room"
       : `${roomOnlineCount} people in room`;
 
+  const [isAdmin, setIsAdmin] = useState(false);
+
   let activeNav = "dashboard";
   if (location.pathname === "/graveyard") activeNav = "graveyard";
   if (location.pathname === "/room") activeNav = "room";
   if (location.pathname === "/profile") activeNav = "profile";
+  if (location.pathname === "/admin") activeNav = "admin";
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", h);
     return () => window.removeEventListener("scroll", h);
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const role = payload.user?.role || payload.role;
+      if (role === "admin") {
+        setIsAdmin(true);
+      } else {
+        fetch("/api/users/me", { headers: { Authorization: `Bearer ${token}` } })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data?.role === "admin") setIsAdmin(true);
+          })
+          .catch(() => {});
+      }
+    } catch (e) {}
   }, []);
 
   const handleLogout = () => {
@@ -45,11 +68,13 @@ export default function Navbar({ roomOnlineCount = null }) {
     { id: "graveyard", label: "Graveyard", icon: "🪦", path: "/graveyard" },
     { id: "extension", label: "Extension", icon: "🔌", action: () => setIsExtensionModalOpen(true) },
     { id: "profile", label: "Profile", icon: "👤", path: "/profile" },
+    ...(isAdmin ? [{ id: "admin", label: "Admin", icon: "🛡️", path: "/admin" }] : []),
   ];
 
   let themeColor = "#00D6FF"; // Default Cyan
   if (activeNav === "graveyard") themeColor = "#7C3AED"; // Purple
   if (activeNav === "room") themeColor = "#FF3B30"; // Premium Red Glowing Mark
+  if (activeNav === "admin") themeColor = "#00D6FF"; // Admin Cyan Glow
 
   return (
     <>

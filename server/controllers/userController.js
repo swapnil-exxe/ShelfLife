@@ -36,6 +36,8 @@ export const registerUser = async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
+        email: user.email,
+        role: user.role || "user",
       },
     };
 
@@ -46,7 +48,7 @@ export const registerUser = async (req, res) => {
       { expiresIn: "5h" }, // Token expires in 5 hours
       (err, token) => {
         if (err) throw err;
-        res.json({ token });
+        res.json({ token, user: { id: user.id, username: user.username, email: user.email, role: user.role || "user" } });
       },
     );
   } catch (err) {
@@ -80,6 +82,8 @@ export const loginUser = async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
+        email: user.email,
+        role: user.role || "user",
       },
     };
 
@@ -90,7 +94,7 @@ export const loginUser = async (req, res) => {
       { expiresIn: "5h" },
       (err, token) => {
         if (err) throw err;
-        res.json({ token });
+        res.json({ token, user: { id: user.id, username: user.username, email: user.email, role: user.role || "user" } });
       },
     );
   } catch (err) {
@@ -131,5 +135,18 @@ export const getMyProfile = async (req, res) => {
   } catch (err) {
     console.error(err.message);
     return res.status(500).send("Server error");
+  }
+};
+
+// @desc    Get current user object
+// @route   GET /api/users/me
+// @access  Private
+export const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password").lean();
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.json(user);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
   }
 };
