@@ -169,3 +169,65 @@ export const getMe = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
+
+// @desc    Update current user profile (username, email, password)
+// @route   PUT /api/users/profile
+// @access  Private
+export const updateMyProfile = async (req, res) => {
+  const { username, email, currentPassword, newPassword } = req.body;
+  const userId = req.user.id;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // If updating password or email, verify current password
+    if (newPassword || (email && email.toLowerCase().trim() !== user.email)) {
+      if (!currentPassword) {
+        return res.status(400).json({ message: "Current password is required to update security credentials." });
+      }
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: "Incorrect current password." });
+      }
+    }
+
+    // Update username if provided
+    if (username && username.trim() !== user.username) {
+      user.username = username.trim();
+    }
+
+    // Update email if provided
+    if (email && email.toLowerCase().trim() !== user.email) {
+      const normalizedEmail = email.toLowerCase().trim();
+      const existingUser = await User.findOne({ email: normalizedEmail, _id: { $ne: userId } });
+      if (existingUser) {
+        return res.status(400).json({ message: "Email is already taken by another account." });
+      }
+      user.email = normalizedEmail;
+    }
+
+    // Update password if newPassword provided
+    if (newPassword) {
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "New password must be at least 6 characters long." });
+      }
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(newPassword, salt);
+      logUserActivity(user._id, "PASSWORD_CHANGED", "SECURITY", "User", user._id, {}, req);
+    }
+
+    await user.save();
+    logUserActivity(user._id, "PROFILE_UPDATED", "USER", "User", user._id, { username: user.username, email: user.email }, req);
+
+    const userObj = user.toObject();
+    delete userObj.password;
+    res.json({ message: "Profile updated successfully!", user: userObj });
+  } catch (err) {
+    console.error("Update profile error:", err.message);
+    res.status(500).json({ message: err.message });
+  }
+};
+

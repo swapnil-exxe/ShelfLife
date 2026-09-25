@@ -128,29 +128,44 @@ export default function Profile() {
   const [cursorFX, setCursorFX] = useState({ x: 50, y: 50, rx: 0, ry: 0 });
   const panelRef = useRef(null);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      setLoading(true);
-      setError("");
+  // Edit Modal State
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editUsername, setEditUsername] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [editError, setEditError] = useState("");
+  const [editSuccess, setEditSuccess] = useState("");
+  const [saving, setSaving] = useState(false);
 
-      try {
-        const response = await axios.get(
-          "/api/users/profile",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+  const fetchProfile = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await axios.get(
+        "/api/users/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        },
+      );
 
-        setProfile(response.data);
-      } catch (err) {
-        setError(err.response?.data?.message || "Failed to load profile");
-      } finally {
-        setLoading(false);
+      setProfile(response.data);
+      if (response.data?.user) {
+        setEditUsername(response.data.user.username || "");
+        setEditEmail(response.data.user.email || "");
       }
-    };
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to load profile");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (!hasToken) return;
     fetchProfile();
   }, [token, hasToken]);
@@ -160,6 +175,61 @@ export default function Profile() {
   const userHasPostedUrls = Number(stats?.totalUrlsPosted || 0) > 0;
   const userTag = userHasPostedUrls ? user?.profileTag : null;
   const theme = useMemo(() => getThemeFromTag(userTag), [userTag]);
+
+  const handleOpenEdit = () => {
+    setEditUsername(user?.username || "");
+    setEditEmail(user?.email || "");
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setEditError("");
+    setEditSuccess("");
+    setShowEditModal(true);
+  };
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    setEditError("");
+    setEditSuccess("");
+
+    if (newPassword && newPassword !== confirmPassword) {
+      setEditError("New passwords do not match.");
+      return;
+    }
+
+    if (newPassword && newPassword.length < 6) {
+      setEditError("New password must be at least 6 characters.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const res = await axios.put(
+        "/api/users/profile",
+        {
+          username: editUsername,
+          email: editEmail,
+          currentPassword,
+          newPassword: newPassword || undefined,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setEditSuccess(res.data.message || "Profile updated successfully!");
+      setTimeout(() => {
+        setShowEditModal(false);
+        fetchProfile();
+      }, 1200);
+    } catch (err) {
+      setEditError(err.response?.data?.message || "Failed to update profile.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handlePanelMouseMove = (event) => {
     if (!panelRef.current) return;
@@ -332,16 +402,43 @@ export default function Profile() {
           />
 
           <div style={{ position: "relative", zIndex: 2 }}>
-            <h1
-              style={{
-                margin: 0,
-                fontFamily: "'Inter', sans-serif",
-                fontSize: "clamp(28px, 4vw, 42px)",
-                letterSpacing: "-0.02em",
-              }}
-            >
-              Your Profile
-            </h1>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h1
+                style={{
+                  margin: 0,
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: "clamp(28px, 4vw, 42px)",
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                Your Profile
+              </h1>
+              {user && (
+                <button
+                  onClick={handleOpenEdit}
+                  style={{
+                    background: theme.accentBg,
+                    border: `1px solid ${theme.accentBorder}`,
+                    color: theme.accentText,
+                    padding: "10px 20px",
+                    borderRadius: "14px",
+                    fontFamily: "'Inter', sans-serif",
+                    fontWeight: 600,
+                    fontSize: 14,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
+                    transition: "all 0.2s ease",
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.04)")}
+                  onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                >
+                  ✏️ Edit Profile
+                </button>
+              )}
+            </div>
 
             <p
               style={{
@@ -438,6 +535,140 @@ export default function Profile() {
           </div>
         </section>
       </main>
+
+      {/* EDIT PROFILE MODAL */}
+      {showEditModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 }}>
+          <form
+            onSubmit={handleSaveProfile}
+            autoComplete="off"
+            style={{
+              background: "#121622",
+              border: `1px solid ${theme.accentBorder || "rgba(255,255,255,0.2)"}`,
+              padding: 32,
+              borderRadius: 20,
+              width: "100%",
+              maxWidth: 440,
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
+              boxShadow: "0 20px 60px rgba(0,0,0,0.7)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 style={{ fontSize: 20, margin: 0, color: theme.accentText || "#00D6FF", fontFamily: "'Inter', sans-serif" }}>Edit Profile</h3>
+              <button type="button" onClick={() => setShowEditModal(false)} style={{ background: "none", border: "none", color: "#fff", fontSize: 20, cursor: "pointer" }}>✕</button>
+            </div>
+
+            {editError && (
+              <div style={{ background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.4)", color: "#f87171", padding: 12, borderRadius: 10, fontSize: 13 }}>
+                ⚠️ {editError}
+              </div>
+            )}
+
+            {editSuccess && (
+              <div style={{ background: "rgba(74,222,128,0.15)", border: "1px solid rgba(74,222,128,0.4)", color: "#4ade80", padding: 12, borderRadius: 10, fontSize: 13 }}>
+                ✓ {editSuccess}
+              </div>
+            )}
+
+            <div>
+              <label style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", marginBottom: 6, display: "block" }}>Username</label>
+              <input
+                type="text"
+                name="profile_edit_username_no_fill"
+                autoComplete="off"
+                required
+                value={editUsername}
+                onChange={(e) => setEditUsername(e.target.value)}
+                style={{ width: "100%", padding: 12, borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", outline: "none" }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", marginBottom: 6, display: "block" }}>Email Address</label>
+              <input
+                type="email"
+                name="profile_edit_email_no_fill"
+                autoComplete="off"
+                required
+                value={editEmail}
+                onChange={(e) => setEditEmail(e.target.value)}
+                style={{ width: "100%", padding: 12, borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", outline: "none" }}
+              />
+            </div>
+
+            <hr style={{ borderColor: "rgba(255,255,255,0.08)", margin: "4px 0" }} />
+
+            <div>
+              <label style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", marginBottom: 6, display: "block" }}>Current Password (required to save changes)</label>
+              <input
+                type="password"
+                name="profile_edit_cur_pass_no_fill"
+                autoComplete="new-password"
+                placeholder="Enter current password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                style={{ width: "100%", padding: 12, borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", outline: "none" }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", marginBottom: 6, display: "block" }}>New Password (optional)</label>
+              <input
+                type="password"
+                name="profile_edit_new_pass_no_fill"
+                autoComplete="new-password"
+                placeholder="Leave blank to keep current password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                style={{ width: "100%", padding: 12, borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", outline: "none" }}
+              />
+            </div>
+
+            {newPassword && (
+              <div>
+                <label style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", marginBottom: 6, display: "block" }}>Confirm New Password</label>
+                <input
+                  type="password"
+                  name="profile_edit_conf_pass_no_fill"
+                  autoComplete="new-password"
+                  placeholder="Confirm new password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  style={{ width: "100%", padding: 12, borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", outline: "none" }}
+                />
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+              <button
+                type="submit"
+                disabled={saving}
+                style={{
+                  flex: 1,
+                  padding: 12,
+                  background: theme.accentBg || "rgba(0, 214, 255, 0.2)",
+                  border: `1px solid ${theme.accentBorder || "#00D6FF"}`,
+                  color: theme.accentText || "#00D6FF",
+                  borderRadius: 10,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowEditModal(false)}
+                style={{ flex: 1, padding: 12, background: "rgba(255,255,255,0.1)", color: "#fff", border: "none", borderRadius: 10, cursor: "pointer" }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
