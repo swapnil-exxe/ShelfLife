@@ -11,11 +11,43 @@ import { logUserActivity } from "../services/activityLogger.js";
 let groq = null;
 const getGroqClient = () => {
   if (!groq) {
-    const apiKey = process.env.GROQ_API_KEY || "gsk_shelflife_llama33_prod_key";
-    groq = new Groq({ apiKey });
+    groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
   }
   return groq;
 };
+
+const GROQ_MODELS = [
+  "qwen/qwen3.8-27b",
+  "openai/gpt-oss-20b",
+  "llama-3.3-70b-versatile"
+];
+
+async function callGroqModel(prompt, { temperature = 0.5, maxTokens = 250 } = {}) {
+  const client = getGroqClient();
+  let lastError = null;
+
+  for (const model of GROQ_MODELS) {
+    try {
+      const chatCompletion = await client.chat.completions.create({
+        messages: [{ role: "user", content: prompt }],
+        model,
+        temperature,
+        max_tokens: maxTokens,
+        top_p: 1,
+        response_format: { type: "json_object" },
+      });
+
+      const content = chatCompletion.choices[0]?.message?.content;
+      if (content) {
+        return JSON.parse(content);
+      }
+    } catch (err) {
+      lastError = err;
+    }
+  }
+
+  throw lastError || new Error("All Groq model completions failed.");
+}
 const FADE_START_DAYS = 14;
 const FADE_END_DAYS = 30;
 const GRAVEYARD_MOVE_DAYS = 31;
@@ -169,21 +201,7 @@ const updateUserProfileTag = async (userId) => {
 
     let normalizedTag = null;
     try {
-      const chatCompletion = await getGroqClient().chat.completions.create({
-        messages: [{ role: "user", content: prompt }],
-        model: "llama-3.3-70b-versatile",
-        temperature: 0.4,
-        max_tokens: 40,
-        top_p: 1,
-        response_format: { type: "json_object" },
-      });
-
-      const result = chatCompletion.choices[0]?.message?.content;
-      if (!result) {
-        throw new Error("Groq tag API returned no result.");
-      }
-
-      const parsed = JSON.parse(result);
+      const parsed = await callGroqModel(prompt, { temperature: 0.4, maxTokens: 40 });
       normalizedTag = normalizeProfileTag(parsed.tag || parsed.profileTag);
       if (!normalizedTag) {
         throw new Error("Groq tag API returned an empty tag.");
@@ -249,18 +267,8 @@ async function getGroqChatCompletion(content) {
   `;
 
   try {
-    const chatCompletion = await getGroqClient().chat.completions.create({
-      messages: [{ role: "user", content: prompt }],
-      model: "llama-3.3-70b-versatile",
-      temperature: 0.7,
-      max_tokens: 250,
-      top_p: 1,
-      response_format: { type: "json_object" },
-    });
-
-    const result = chatCompletion.choices[0]?.message?.content;
-    if (!result) throw new Error("Groq API returned no result.");
-    return JSON.parse(result);
+    const parsed = await callGroqModel(prompt, { temperature: 0.7, maxTokens: 250 });
+    return parsed;
   } catch (error) {
     console.error("Groq API Error:", error);
     return {
@@ -287,19 +295,7 @@ async function getCategoryFromSummary(summary) {
   `;
 
   try {
-    const chatCompletion = await getGroqClient().chat.completions.create({
-      messages: [{ role: "user", content: prompt }],
-      model: "llama-3.3-70b-versatile",
-      temperature: 0.5,
-      max_tokens: 50,
-      top_p: 1,
-      response_format: { type: "json_object" },
-    });
-
-    const result = chatCompletion.choices[0]?.message?.content;
-    if (!result) throw new Error("Groq API returned no category result.");
-
-    const parsedResult = JSON.parse(result);
+    const parsedResult = await callGroqModel(prompt, { temperature: 0.5, maxTokens: 50 });
     return normalizeVibe(parsedResult.category || parsedResult.vibe);
   } catch (error) {
     console.error("Groq Category API Error:", error);
