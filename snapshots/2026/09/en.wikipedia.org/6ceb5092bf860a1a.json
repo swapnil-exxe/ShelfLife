@@ -1,0 +1,11 @@
+{
+  "url": "https://en.wikipedia.org/wiki/Artificial_intelligence",
+  "final_url": "https://en.wikipedia.org/wiki/Artificial_intelligence",
+  "timestamp": "2026-09-25T08:05:56.264674",
+  "status_code": 200,
+  "content_hash": "6ceb5092bf860a1ab627563540d53533d078eeada885dc66f3b58f81ed197c4c",
+  "title": "Artificial intelligence - Wikipedia",
+  "text_length": 186542,
+  "fetch_method": "fast_http",
+  "quality_score": 80
+}

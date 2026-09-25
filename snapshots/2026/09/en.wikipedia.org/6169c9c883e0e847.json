@@ -1,0 +1,11 @@
+{
+  "url": "https://en.wikipedia.org/wiki/Web_scraping",
+  "final_url": "https://en.wikipedia.org/wiki/Web_scraping",
+  "timestamp": "2026-09-25T08:04:46.746253",
+  "status_code": 200,
+  "content_hash": "6169c9c883e0e8478841efee9815fb58e02ba07434307c08b72c26a367617b35",
+  "title": "Web scraping - Wikipedia",
+  "text_length": 26675,
+  "fetch_method": "fast_http",
+  "quality_score": 80
+}
