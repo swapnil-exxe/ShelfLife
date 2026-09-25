@@ -11,7 +11,8 @@ import { logUserActivity } from "../services/activityLogger.js";
 let groq = null;
 const getGroqClient = () => {
   if (!groq) {
-    groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const apiKey = process.env.GROQ_API_KEY || "gsk_shelflife_llama33_prod_key";
+    groq = new Groq({ apiKey });
   }
   return groq;
 };

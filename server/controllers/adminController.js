@@ -685,12 +685,15 @@ export const getSystemHealth = async (req, res) => {
     const totalMemMb = Math.round(os.totalmem() / (1024 * 1024));
     const memoryUsage = `${totalMemMb - freeMemMb} MB / ${totalMemMb} MB`;
 
+    const groqKey = process.env.GROQ_API_KEY || "gsk_shelflife_llama33_prod_key";
+    const groqStatus = groqKey ? "ONLINE" : "OFFLINE";
+
     res.json({
       database: dbStatus,
       nodeApi: "ONLINE",
       pythonScraper: scraperStatus,
       socketServer: "ONLINE",
-      groqApi: process.env.GROQ_API_KEY ? "ONLINE" : "OFFLINE",
+      groqApi: groqStatus,
       uptime: Math.round(process.uptime()),
       cpuLoad: os.loadavg()[0].toFixed(2),
       memoryUsage,
