@@ -39,20 +39,30 @@ export default function Navbar({ roomOnlineCount = null }) {
     const token = localStorage.getItem("token");
     if (!token) return;
 
+    let role = null;
     try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      const role = payload.user?.role || payload.role;
-      if (role === "admin") {
-        setIsAdmin(true);
-      } else {
-        fetch("/api/users/me", { headers: { Authorization: `Bearer ${token}` } })
-          .then((r) => r.json())
-          .then((data) => {
-            if (data?.role === "admin") setIsAdmin(true);
-          })
-          .catch(() => {});
-      }
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      const payload = JSON.parse(jsonPayload);
+      role = payload.user?.role || payload.role;
     } catch (e) {}
+
+    if (role === "admin") {
+      setIsAdmin(true);
+    } else {
+      fetch("/api/users/me", { headers: { Authorization: `Bearer ${token}` } })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data?.role === "admin") setIsAdmin(true);
+        })
+        .catch(() => {});
+    }
   }, []);
 
   const handleLogout = () => {
